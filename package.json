@@ -1,0 +1,21 @@
+{
+  "name": "dc-messaging",
+  "version": "1.0.0",
+  "description": "IPFS pubsub messaging module",
+  "main": "rtc.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devEngines": {
+    "node": ">=9.5",
+    "npm": ">=5.x"
+  },
+  "dependencies": {
+    "event-emitter": "^0.3.5",
+    "ipfs": "^0.27.7",
+    "ipfs-pubsub-room": "^1.1.5"
+  }
+}
