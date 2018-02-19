@@ -4,13 +4,11 @@
 
 Creates a room based on an IPFS pub-sub channel. 
 Emits membership events, listens for messages, broadcast and direct messeges to peers.
-________________________________________
 
 ### Install
 ```shell
 npm install daocasino/dc-messanging
 ```
-________________________________________
 ### Usage
 ```js
   import RTC from 'dc-messanging'
