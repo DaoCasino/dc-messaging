@@ -2,6 +2,10 @@
 
 [![JavaScript Style Guide](https://cdn.rawgit.com/standard/standard/master/badge.svg)](https://github.com/standard/standard)
 
+Creates a room based on an IPFS pub-sub channel. 
+Emits membership events, listens for messages, broadcast and direct messeges to peers.
+________________________________________
+
 ### Install
 ```shell
 npm install daocasino/dc-messanging
