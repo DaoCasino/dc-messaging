@@ -65,18 +65,26 @@ const seedsDB = (function () {
 
 let ipfs_connected = false
 
+let repo = './data/messaging/DB'
+if (process.env.NODE_ENV) {
+  repo += Math.ceil( Math.random() * 10000 )
+}
+
 function upIPFS () {
   try {
 
     global.ipfs = new IPFS({
-      // repo: '../database',
+      repo: repo,
       EXPERIMENTAL: {
         pubsub: true
       },
       config: {
         Addresses: {
           Swarm: [
-            // '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
+            // '/ip4/127.0.0.1/tcp/9191/wss/p2p-webrtc-star',
+            // '/ip4/127.0.0.1/tcp/9191/ws/p2p-websocket-star',
+            // '/ip4/127.0.0.1/tcp/9090/ws/p2p-websocket-star'
+            '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
             // '/ip4/127.0.0.1/tcp/4001'
           ]
         }

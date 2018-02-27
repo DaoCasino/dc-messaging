@@ -7,7 +7,8 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "pingpong":"NODE_ENV=test babel-node ./test/pingpong.js",
+    "test": "npm run pingpong & npm run pingpong "
   },
   "devEngines": {
     "node": ">=9.5",
@@ -17,5 +18,9 @@
     "event-emitter": "^0.3.5",
     "ipfs": "^0.27.7",
     "ipfs-pubsub-room": "^1.1.5"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1"
   }
 }
