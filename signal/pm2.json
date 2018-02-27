@@ -1,0 +1,6 @@
+{
+  "name": "signal",
+  "script": "npm",
+  "args":"start",
+  "max_memory_restart":"100M"
+}

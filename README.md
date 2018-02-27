@@ -43,6 +43,14 @@ room.sendMsg(data)
 
 ### Signal server
 ```
+cd ./signal 
+npm i 
+npm start
+```
+
+or 
+
+```
 npm run install_signalserver
 npm run start_signalserver
 ```

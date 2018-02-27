@@ -10,7 +10,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
+  "dependencies": {
     "libp2p-websocket-star-rendezvous": "^0.2.3"
   }
 }
