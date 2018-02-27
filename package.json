@@ -7,7 +7,7 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "pingpong":"NODE_ENV=test babel-node ./test/pingpong.js",
+    "pingpong": "NODE_ENV=test babel-node ./test/pingpong.js",
     "test": "npm run pingpong & npm run pingpong "
   },
   "devEngines": {
