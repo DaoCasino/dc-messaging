@@ -81,7 +81,8 @@ function upIPFS () {
       config: {
         Addresses: {
           Swarm: [
-            '/ip4/46.101.244.101/tcp/9090/ws/p2p-websocket-star/'
+            '/ip4/46.101.244.101/tcp/9090/ws/p2p-websocket-star/',
+            '/ip4/146.185.173.84/tcp/9090/ws/p2p-websocket-star/'
             // '/dns4/localhost/tcp/9090/ws/p2p-websocket-star/'
           ]
         }
