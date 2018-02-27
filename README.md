@@ -39,3 +39,18 @@ room.unsubscribe(address, callback)
 // Sending message in all room users
 room.sendMsg(data)
 ```
+
+
+### Signal server
+```
+npm run install_signalserver
+npm run start_signalserver
+```
+
+or 
+
+```
+npm i -g libp2p-websocket-star-rendezvous
+rendezvous --port=9090 --host=localhost
+```
+and open http://localhost:9090 in browser, you see signal url aka `s /dns4/localhost/tcp/9090/ws/p2p-websocket-star/`

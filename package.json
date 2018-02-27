@@ -7,6 +7,9 @@
   "author": "",
   "license": "ISC",
   "scripts": {
+    "install_signalserver":"npm i -g libp2p-websocket-star-rendezvous",
+    "start_signalserver":"rendezvous --port=9090 --host=localhost",
+
     "pingpong": "NODE_ENV=test babel-node ./test/pingpong.js",
     "test": "npm run pingpong & npm run pingpong "
   },

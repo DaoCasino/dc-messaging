@@ -7,16 +7,29 @@ console.log('')
 
 const Room = new Rtc()
 
-setInterval(() => {
-  // console.log('send ping')
+
+let pingInterval = setInterval(() => {
   Room.sendMsg({action: 'ping'})
 }, 3333)
 
-Room.on('all', data => {
-  console.log(data)
-  Room.sendMsg({action: 'pong'})
+let pingCnt = 0
+let pongCnt = 0
+
+Room.on('action::ping', data => {
+  pingCnt++
+  console.log('Ping ' + pingCnt + ' ' + data.user_id)
+  setTimeout(() => {
+    Room.sendMsg({action: 'pong'})
+  }, 555)
 })
 
-Room.on('pong', data => {
-  console.log(data)
+Room.on('action::pong', data => {
+  clearInterval(pingInterval)
+  pongCnt++
+  console.log('Pong '+ pongCnt + ' ' + data.user_id)
+  setTimeout(() => {
+    Room.sendMsg({action: 'ping'})
+  }, 777)
 })
+
+

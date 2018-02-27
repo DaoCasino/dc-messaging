@@ -1,0 +1,16 @@
+{
+  "name": "signal",
+  "version": "1.0.0",
+  "description": "webrtc signal node",
+  "main": "index.js",
+  "scripts": {
+    "start": "rendezvous --port=9090 --host=localhost",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "libp2p-websocket-star-rendezvous": "^0.2.3"
+  }
+}
