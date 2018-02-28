@@ -2,16 +2,16 @@
   "name": "dc-messaging",
   "version": "1.0.0",
   "description": "IPFS pubsub messaging module",
-  "main": "rtc.js",
+  "main": "rtc.bundle.js",
   "keywords": [],
   "author": "",
   "license": "ISC",
   "scripts": {
-    "install_signalserver":"npm i -g libp2p-websocket-star-rendezvous",
-    "start_signalserver":"rendezvous --port=9090 --host=localhost",
-
+    "install_signalserver": "npm i -g libp2p-websocket-star-rendezvous",
+    "start_signalserver": "rendezvous --port=9090 --host=localhost",
     "pingpong": "NODE_ENV=test babel-node ./test/pingpong.js",
-    "test": "npm run pingpong & npm run pingpong "
+    "test": "npm run pingpong & npm run pingpong ",
+    "build": "rollup rtc.js --output.format cjs --output.file rtc.bundle.js"
   },
   "devEngines": {
     "node": ">=9.5",
@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.1"
+    "babel-preset-env": "^1.6.1",
+    "rollup": "^0.56.3"
   }
 }
