@@ -2,14 +2,35 @@
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
+var debug = _interopDefault(require('debug'));
 var EE = _interopDefault(require('event-emitter'));
 var IPFS = _interopDefault(require('ipfs'));
 var Channel = _interopDefault(require('ipfs-pubsub-room'));
 
+const debugLog = function (string, loglevel, enable = true) {
+  let log = debug('');
+
+  if (loglevel === 'hight') log.enabled = true;
+
+  loglevel === 'light' && !enable
+    ? log.enabled = false
+    : log.enabled = true;
+
+  if (loglevel === 'error') {
+    log = debug(loglevel.name);
+    log.enabled = true;
+  }
+
+  if (loglevel === 'none')  log.enabled = false;
+
+  return log(string)
+};
+
 /* global localStorage */
 
 const _config = {
-  rtc_room: 'default_room_name'
+  rtc_room: 'default_room_name',
+  loglevel: 'light'
 };
 
 const uID = function () {
@@ -98,7 +119,7 @@ function upIPFS () {
     });
 
   } catch (err) {
-    console.log('Restart IPFS', err);
+    debugLog('Restart IPFS ' + err, 'error');
     upIPFS();
   }
 }
@@ -113,7 +134,7 @@ class RTC {
     this.Event = new EC();
 
     if (!room) {
-      console.error('empty room name');
+      debugLog('empty room name', 'error');
       return
     }
 
@@ -132,7 +153,7 @@ class RTC {
       }, 999);
       return
     }
-    console.log('room:' + room);
+    debugLog('room:' + room, _config.loglevel);
     this.channel = Channel(global.ipfs, room);
 
     this.channel.on('message', rawmsg => {
@@ -177,16 +198,16 @@ class RTC {
     });
 
     this.channel.on('peer joined', (peer) => {
-      console.log('Peer(' + peer + ') joined the room ', this.room_id);
+      debugLog('Peer(' + peer + ') joined the room ' + this.room_id, _config.loglevel);
     });
 
     this.channel.on('peer left', (peer) => {
-      console.log('Peer left...', peer);
+      debugLog('Peer left... ' + peer, _config.loglevel);
     });
 
     // now started to listen to room
     this.channel.on('subscribed', () => {
-      console.log('Now connected!');
+      debugLog('Now connected!', _config.loglevel, false);
     });
   }
 

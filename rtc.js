@@ -3,9 +3,11 @@
 import EE         from 'event-emitter'
 import IPFS       from 'ipfs'
 import Channel    from 'ipfs-pubsub-room'
+import * as Utils from './utils'
 
 const _config = {
-  rtc_room: 'default_room_name'
+  rtc_room: 'default_room_name',
+  loglevel: 'light'
 }
 
 const uID = function () {
@@ -94,7 +96,7 @@ function upIPFS () {
     })
 
   } catch (err) {
-    console.log('Restart IPFS', err)
+    Utils.debugLog('Restart IPFS ' + err, 'error')
     upIPFS()
   }
 }
@@ -109,7 +111,7 @@ export default class RTC {
     this.Event = new EC()
 
     if (!room) {
-      console.error('empty room name')
+      Utils.debugLog('empty room name', 'error')
       return
     }
 
@@ -128,7 +130,7 @@ export default class RTC {
       }, 999)
       return
     }
-    console.log('room:' + room)
+    Utils.debugLog('room:' + room, _config.loglevel)
     this.channel = Channel(global.ipfs, room)
 
     this.channel.on('message', rawmsg => {
@@ -173,16 +175,16 @@ export default class RTC {
     })
 
     this.channel.on('peer joined', (peer) => {
-      console.log('Peer(' + peer + ') joined the room ', this.room_id)
+      Utils.debugLog('Peer(' + peer + ') joined the room ' + this.room_id, _config.loglevel)
     })
 
     this.channel.on('peer left', (peer) => {
-      console.log('Peer left...', peer)
+      Utils.debugLog('Peer left... ' + peer, _config.loglevel)
     })
 
     // now started to listen to room
     this.channel.on('subscribed', () => {
-      console.log('Now connected!')
+      Utils.debugLog('Now connected!', _config.loglevel, false)
     })
   }
 
