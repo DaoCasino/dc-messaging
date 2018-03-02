@@ -17,7 +17,7 @@ const debugLog = function (string, loglevel, enable = true) {
     : log.enabled = true;
 
   if (loglevel === 'error') {
-    log = debug(loglevel.name);
+    log = debug(loglevel);
     log.enabled = true;
   }
 
