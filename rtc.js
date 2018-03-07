@@ -68,8 +68,19 @@ const seedsDB = (function () {
 let ipfs_connected = false
 
 let repo = './data/messaging/DB'
-if (process.env.NODE_ENV) {
+if (process.env.NODE_ENV==='test') {
   repo += Math.ceil( Math.random() * 10000 )
+}
+
+
+let swarmlist = [
+  '/ip4/46.101.244.101/tcp/9090/ws/p2p-websocket-star/',
+  '/ip4/146.185.173.84/tcp/9090/ws/p2p-websocket-star/'
+]
+if (process.env.DC_NETWORK === 'local') {
+  swarmlist = [
+    '/ip4/127.0.0.1/tcp/9090/ws/p2p-websocket-star/',
+  ]
 }
 
 function upIPFS () {
@@ -82,12 +93,7 @@ function upIPFS () {
       },
       config: {
         Addresses: {
-          Swarm: [
-            '/ip4/46.101.244.101/tcp/9090/ws/p2p-websocket-star/',
-            '/ip4/146.185.173.84/tcp/9090/ws/p2p-websocket-star/'
-            // '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
-            // '/dns4/localhost/tcp/9090/ws/p2p-websocket-star/'
-          ]
+          Swarm: swarmlist
         }
       }
     })
