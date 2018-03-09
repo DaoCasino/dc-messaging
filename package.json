@@ -20,8 +20,8 @@
   "dependencies": {
     "debug": "^3.1.0",
     "event-emitter": "^0.3.5",
-    "ipfs": "DaoCasino/ipfs",
-    "ipfs-pubsub-room": "DaoCasino/ipfs-pubsub-room"
+    "ipfs": "DaoCasino/js-ipfs",
+    "ipfs-pubsub-room":"DaoCasino/ipfs-pubsub-room"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
