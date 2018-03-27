@@ -87,7 +87,10 @@ export function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/w
   try {
 
     let server = swarmlist
-    if (!Array.isArray(swarmlist)) server = [swarmlist] 
+    if (!Array.isArray(swarmlist)) {
+      server = []
+      server.push(swarmlist)
+    } 
     
     console.log(server)
 
