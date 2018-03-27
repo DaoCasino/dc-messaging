@@ -26,7 +26,7 @@ Room.on('action::ping', data => {
 Room.on('action::pong', data => {
   clearInterval(pingInterval)
   pongCnt++
-  console.log('Pong '+ pongCnt + ' ' + data.user_id)
+  console.log('Pong ' + pongCnt + ' ' + data.user_id)
   setTimeout(() => {
     Room.sendMsg({action: 'ping'})
   }, 777)
