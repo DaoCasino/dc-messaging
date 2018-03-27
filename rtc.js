@@ -83,7 +83,7 @@ if (process.env.DC_NETWORK === 'local') {
   ]
 }
 
-function upIPFS () {
+function upIPFS (server) {
   try {
 
     global.ipfs = new IPFS({
@@ -106,10 +106,11 @@ function upIPFS () {
     upIPFS()
   }
 }
-upIPFS()
+// upIPFS()
 
 export default class RTC {
-  constructor (user_id = false, room = false) {
+  constructor (user_id = false, room = false, signal_server = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star') {
+    upIPFS(signal_server)
     room = room || _config.rtc_room
 
     const EC = function () {}
