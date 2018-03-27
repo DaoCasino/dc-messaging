@@ -111,6 +111,8 @@ function upIPFS (swarmlist) {
 
     let server = swarmlist;
     if (!Array.isArray(swarmlist)) server = [swarmlist]; 
+    
+    console.log(server);
 
     global.ipfs = new IPFS({
       repo: repo,
