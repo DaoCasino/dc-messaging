@@ -94,16 +94,23 @@ let repo = './data/messaging/DB';
 if (process.env.NODE_ENV === 'test') {
   repo += Math.ceil( Math.random() * 10000 );
 }
-if (process.env.DC_NETWORK === 'local') {
-}
+
+
+// let swarmlist = [
+//   '/ip4/46.101.244.101/tcp/9090/ws/p2p-websocket-star/'
+//   // '/ip4/146.185.173.84/tcp/9090/ws/p2p-websocket-star/'
+// ]
+// if (process.env.DC_NETWORK === 'local') {
+//   swarmlist = [
+//     '/ip4/127.0.0.1/tcp/9090/ws/p2p-websocket-star/'
+//   ]
+// }
 
 function upIPFS (server = false) {
   try {
-    let swarmSignal = server;
 
-    if (!Array.isArray(server)) {
-      swarmSignal = [server];
-    }
+    let signal = server;
+    if (!Array.isArray(server)) signal = [server];
 
     global.ipfs = new IPFS({
       repo: repo,
@@ -112,11 +119,10 @@ function upIPFS (server = false) {
       },
       config: {
         Addresses: {
-          Swarm: swarmSignal
+          Swarm: signal
         }
       }
     });
-
     global.ipfs.on('ready', () => {
       ipfs_connected = true;
     });
