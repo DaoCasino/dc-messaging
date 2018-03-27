@@ -1,5 +1,7 @@
 'use strict';
 
+Object.defineProperty(exports, '__esModule', { value: true });
+
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var debug = _interopDefault(require('debug'));
@@ -136,8 +138,7 @@ function upIPFS (swarmlist) {
 }
 
 class RTC {
-  constructor (user_id = false, room = false, signal = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star') {
-    upIPFS(signal);
+  constructor (user_id = false, room = false) {
     room = room || _config.rtc_room;
 
     const EC = function () {};
@@ -373,4 +374,5 @@ class RTC {
   }
 }
 
-module.exports = RTC;
+exports.upIPFS = upIPFS;
+exports.RTC = RTC;

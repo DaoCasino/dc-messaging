@@ -1,12 +1,13 @@
-import Rtc from '../rtc.js'
+import * as messaging from '../rtc.js'
 
 console.log('')
 console.log('Ping pong start')
 console.log('')
 console.log('')
 
-const Room = new Rtc()
 
+messaging.upIPFS('/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star')
+const Room = new messaging.RTC()
 
 let pingInterval = setInterval(() => {
   Room.sendMsg({action: 'ping'})
