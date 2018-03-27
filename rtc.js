@@ -92,8 +92,6 @@ export function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/w
       server.push(swarmlist)
     } 
     
-    console.log(server)
-
     global.ipfs = new IPFS({
       repo: repo,
       EXPERIMENTAL: {
