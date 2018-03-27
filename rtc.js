@@ -93,7 +93,9 @@ function upIPFS (server) {
       },
       config: {
         Addresses: {
-          Swarm: server
+          Swarm: [
+            server
+          ]
         }
       }
     })
@@ -103,7 +105,7 @@ function upIPFS (server) {
 
   } catch (err) {
     Utils.debugLog('Restart IPFS ' + err, 'error')
-    upIPFS()
+    upIPFS(server)
   }
 }
 // upIPFS()
