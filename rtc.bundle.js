@@ -99,6 +99,11 @@ if (process.env.DC_NETWORK === 'local') {
 
 function upIPFS (server = false) {
   try {
+    let swarmSignal = server;
+
+    if (!Array.isArray(server)) {
+      swarmSignal = [server];
+    }
 
     global.ipfs = new IPFS({
       repo: repo,
@@ -107,12 +112,11 @@ function upIPFS (server = false) {
       },
       config: {
         Addresses: {
-          Swarm: [
-            server
-          ]
+          Swarm: swarmSignal
         }
       }
     });
+
     global.ipfs.on('ready', () => {
       ipfs_connected = true;
     });
