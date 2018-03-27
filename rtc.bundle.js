@@ -94,16 +94,7 @@ let repo = './data/messaging/DB';
 if (process.env.NODE_ENV === 'test') {
   repo += Math.ceil( Math.random() * 10000 );
 }
-
-
-let swarmlist = [
-  '/ip4/46.101.244.101/tcp/9090/ws/p2p-websocket-star/'
-  // '/ip4/146.185.173.84/tcp/9090/ws/p2p-websocket-star/'
-];
 if (process.env.DC_NETWORK === 'local') {
-  swarmlist = [
-    '/ip4/127.0.0.1/tcp/9090/ws/p2p-websocket-star/'
-  ];
 }
 
 function upIPFS (server) {
@@ -116,7 +107,7 @@ function upIPFS (server) {
       },
       config: {
         Addresses: {
-          Swarm: swarmlist
+          Swarm: server
         }
       }
     });

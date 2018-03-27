@@ -93,7 +93,7 @@ function upIPFS (server) {
       },
       config: {
         Addresses: {
-          Swarm: swarmlist
+          Swarm: server
         }
       }
     })
