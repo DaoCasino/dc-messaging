@@ -83,7 +83,7 @@ if (process.env.NODE_ENV === 'test') {
 //   ]
 // }
 
-export function upIPFS (swarmlist) {
+export function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star') {
   try {
 
     let server = swarmlist
@@ -108,7 +108,7 @@ export function upIPFS (swarmlist) {
 
   } catch (err) {
     Utils.debugLog('Restart IPFS ' + err, 'error')
-    upIPFS()
+    upIPFS('/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star')
   }
 }
 
