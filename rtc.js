@@ -83,11 +83,11 @@ if (process.env.NODE_ENV === 'test') {
 //   ]
 // }
 
-function upIPFS (server = false) {
+function upIPFS (swarmlist) {
   try {
 
-    let signal = server
-    if (!Array.isArray(server)) signal = [server]
+    let server = swarmlist
+    if (!Array.isArray(swarmlist)) server = [swarmlist] 
 
     global.ipfs = new IPFS({
       repo: repo,
@@ -96,7 +96,7 @@ function upIPFS (server = false) {
       },
       config: {
         Addresses: {
-          Swarm: signal
+          Swarm: server
         }
       }
     })
@@ -106,14 +106,13 @@ function upIPFS (server = false) {
 
   } catch (err) {
     Utils.debugLog('Restart IPFS ' + err, 'error')
-    upIPFS(server)
+    upIPFS()
   }
 }
-// upIPFS()
 
 export default class RTC {
-  constructor (user_id = false, room = false, signal_server = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star') {
-    upIPFS(signal_server)
+  constructor (user_id = false, room = false, signal = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star') {
+    upIPFS(signal)
     room = room || _config.rtc_room
 
     const EC = function () {}
