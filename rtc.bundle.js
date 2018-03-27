@@ -97,7 +97,7 @@ if (process.env.NODE_ENV === 'test') {
 if (process.env.DC_NETWORK === 'local') {
 }
 
-function upIPFS (server) {
+function upIPFS (server = false) {
   try {
 
     global.ipfs = new IPFS({
