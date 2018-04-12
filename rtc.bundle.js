@@ -117,8 +117,6 @@ function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-
       server.push(swarmlist);
     } 
     
-    console.log(server);
-
     global.ipfs = new IPFS({
       repo: repo,
       EXPERIMENTAL: {
@@ -136,7 +134,7 @@ function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-
 
   } catch (err) {
     debugLog('Restart IPFS ' + err, 'error');
-    upIPFS('/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star');
+    upIPFS(swarmlist);
   }
 }
 
