@@ -67,7 +67,7 @@ const seedsDB = (function () {
 
 let ipfs_connected = false
 
-let repo = './data/messaging/DB'
+let repo = './data/messaging/DataBase'
 if (process.env.NODE_ENV === 'test') {
   repo += Math.ceil( Math.random() * 10000 )
 }
