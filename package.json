@@ -10,6 +10,7 @@
     "install_signalserver": "npm i -g libp2p-websocket-star-rendezvous",
     "start_signalserver": "rendezvous --port=9090 --host=localhost",
     "pingpong": "NODE_ENV=test babel-node ./test/pingpong.js",
+    "signmess": "NODE_ENV=test babel-node ./test/signmess/peer1.js & NODE_ENV=test babel-node ./test/signmess/peer2.js",
     "test": "npm run pingpong & npm run pingpong ",
     "build": "rollup rtc.js --output.format cjs --output.file rtc.bundle.js"
   },
@@ -23,12 +24,14 @@
     "ipfs": "DaoCasino/js-ipfs",
     "ipfs-pubsub-room": "DaoCasino/ipfs-pubsub-room",
     "ipfs-repo": "^0.18.7",
-    "libp2p": "github:DaoCasino/js-libp2p#dc-patch-1"
+    "libp2p": "github:DaoCasino/js-libp2p#dc-patch-1",
+    "web3": "^1.0.0-beta.33"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "cz-conventional-changelog": "^2.1.0",
+    "random-object-generator": "^1.0.2",
     "rollup": "^0.56.3"
   },
   "config": {

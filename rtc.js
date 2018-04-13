@@ -3,6 +3,7 @@
 import EE         from 'event-emitter'
 import IPFS       from 'ipfs'
 import Channel    from 'ipfs-pubsub-room'
+import WEB3       from 'web3'
 import * as Utils from './utils'
 
 const _config = {
@@ -114,7 +115,7 @@ export function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/w
 }
 
 export class RTC {
-  constructor (user_id = false, room = false) {
+  constructor (user_id = false, room = false, secure = false) {
     room = room || _config.rtc_room
 
     const EC = function () {}
@@ -124,6 +125,14 @@ export class RTC {
     if (!room) {
       Utils.debugLog('empty room name', 'error')
       return
+    }
+    
+    this.web3 = new WEB3(new WEB3.providers.HttpProvider('https://ropsten.infura.io/JCnK5ifEPH9qcQkX0Ahl'))
+
+    if (secure) {
+      this.secure      = secure
+      this.privateKey  = this.web3.eth.accounts.decrypt(this.secure.privateKey, '1234').privateKey
+      this.arr_openKey = this.secure.allowed_users 
     }
 
     this.user_id = user_id || uID()
@@ -201,6 +210,7 @@ export class RTC {
 
   async isAlreadyReceived (data) {
     // isAlreadyReceived(data){
+    console.log(data)
     if (!data.seed || typeof data.seed !== 'string' || data.action === 'delivery_confirmation') {
       return false
     }
@@ -260,25 +270,40 @@ export class RTC {
       return
     }
 
+    if (this.secure) {
+      const recover = this.web3.eth.accounts.recover({
+        messageHash: acquired_data.sign_mess.messageHash,
+        v: acquired_data.sign_mess.v,
+        r: acquired_data.sign_mess.r,
+        s: acquired_data.sign_mess.s
+      }).toLowerCase()
+
+      const check_sign = this.secure.allowed_users.some(element => {
+        return element.toLowerCase() === recover.toLowerCase()
+      })
+
+      if (!check_sign) throw new Error('Error invalid sign')
+    }
+    
     this.sendMsg({
       address:  acquired_data.address,
       seed:     uID(),
       action:   'delivery_confirmation',
-      acquired: acquired_data
+      message: acquired_data
     })
   }
 
   // Проверка получения отправленного сообщения
   CheckReceipt (sended_data, callback) {
     let subscribe_index = false
-
     let address = sended_data.address
+
     let waitReceipt = data => {
       if (!data.action || data.action !== 'delivery_confirmation') {
         return
       }
 
-      if (this.equaMsgs(sended_data, data.acquired)) {
+      if (this.equaMsgs(sended_data, data.message)) {
         this.unsubscribe(address, waitReceipt, subscribe_index)
 
         if (this.CheckReceiptsT[sended_data.seed]) {
@@ -342,6 +367,10 @@ export class RTC {
 
     data.seed       = uID()
     data.user_id    = this.user_id
+    // signed message
+    if (this.secure) {
+      data.sign_mess = this.web3.eth.accounts.sign(JSON.stringify(data), this.privateKey)
+    }
     // data.room_id = this.room_id
 
     this.channel.broadcast(JSON.stringify(data))
