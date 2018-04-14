@@ -17,6 +17,9 @@ const uID = function () {
 
 const delivery_timeout = 7000
 const msg_ttl = 10 * 60 * 1000
+let _secure     = false
+let _privateKey = false
+let _openkey    = false
 
 const seedsDB = (function () {
   const store_name = 'rtc_msgs_seeds'
@@ -130,9 +133,9 @@ export class RTC {
     this.web3 = new WEB3(new WEB3.providers.HttpProvider('https://ropsten.infura.io/JCnK5ifEPH9qcQkX0Ahl'))
 
     if (secure) {
-      this.secure      = secure
-      this.privateKey  = this.web3.eth.accounts.decrypt(this.secure.privateKey, '1234').privateKey
-      this.arr_openKey = this.secure.allowed_users 
+      _secure      = secure
+      _privateKey  = _secure.privateKey
+      _openkey     = _secure.allowed_users 
     }
 
     this.user_id = user_id || uID()
@@ -157,6 +160,11 @@ export class RTC {
       let data = {}
       try {
         data = JSON.parse(rawmsg.data.toString())
+
+        if (_secure) {
+          let sign_mess = data.sign_mess
+          if (!this.validSig(sign_mess)) return
+        }
       } catch (e) {
         return
       }
@@ -208,9 +216,26 @@ export class RTC {
     })
   }
 
+  validSig (sign_mess) {
+    if (_secure) {
+      const recover = this.web3.eth.accounts.recover({
+        messageHash: sign_mess.messageHash,
+        v: sign_mess.v,
+        r: sign_mess.r,
+        s: sign_mess.s
+      }).toLowerCase()
+
+      const check_sign = _openkey.some(element => {
+        return element.toLowerCase() === recover.toLowerCase()
+      })
+
+      if (!check_sign) return false
+      return check_sign
+    }
+  }
+  
   async isAlreadyReceived (data) {
     // isAlreadyReceived(data){
-    console.log(data)
     if (!data.seed || typeof data.seed !== 'string' || data.action === 'delivery_confirmation') {
       return false
     }
@@ -269,27 +294,12 @@ export class RTC {
       acquired_data.action  === 'bankroller_active') {
       return
     }
-
-    if (this.secure) {
-      const recover = this.web3.eth.accounts.recover({
-        messageHash: acquired_data.sign_mess.messageHash,
-        v: acquired_data.sign_mess.v,
-        r: acquired_data.sign_mess.r,
-        s: acquired_data.sign_mess.s
-      }).toLowerCase()
-
-      const check_sign = this.secure.allowed_users.some(element => {
-        return element.toLowerCase() === recover.toLowerCase()
-      })
-
-      if (!check_sign) throw new Error('Error invalid sign')
-    }
     
     this.sendMsg({
-      address:  acquired_data.address,
-      seed:     uID(),
-      action:   'delivery_confirmation',
-      message: acquired_data
+      address : acquired_data.address,
+      seed    : uID(),
+      action  : 'delivery_confirmation',
+      message : acquired_data
     })
   }
 
@@ -320,7 +330,7 @@ export class RTC {
       this.CheckReceiptsT = {}
     }
 
-    this.CheckReceiptsT[sended_data.seed] = setTimeout(() => {
+    this.CheckReceiptsT[sended_data.data.seed] = setTimeout(() => {
       this.unsubscribe(address, waitReceipt, subscribe_index)
 
       callback(false)
@@ -368,8 +378,8 @@ export class RTC {
     data.seed       = uID()
     data.user_id    = this.user_id
     // signed message
-    if (this.secure) {
-      data.sign_mess = this.web3.eth.accounts.sign(JSON.stringify(data), this.privateKey)
+    if (_secure) {
+      data.sign_mess = this.web3.eth.accounts.sign(JSON.stringify(data), _privateKey)
     }
     // data.room_id = this.room_id
 

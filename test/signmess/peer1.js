@@ -30,7 +30,7 @@ SharedRoom.on('action::getAddress', data => {
   console.log('peer1', allow_address)
   
   const Room = new messaging.RTC(account.address, 'GameRoom', {
-    privateKey    : web3.eth.accounts.encrypt(account.privateKey, '1234'),
+    privateKey    : account.privateKey,
     allowed_users : allow_address
   })
 
