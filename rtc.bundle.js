@@ -42,6 +42,7 @@ const uID = function () {
 
 const delivery_timeout = 7000;
 const msg_ttl = 10 * 60 * 1000;
+let _secure     = false;
 
 const seedsDB = (function () {
   const store_name = 'rtc_msgs_seeds';
@@ -154,11 +155,7 @@ class RTC {
     
     this.web3 = new WEB3(new WEB3.providers.HttpProvider('https://ropsten.infura.io/JCnK5ifEPH9qcQkX0Ahl'));
 
-    if (secure) {
-      this.secure      = secure;
-      this.privateKey  = this.web3.eth.accounts.decrypt(this.secure.privateKey, '1234').privateKey;
-      this.arr_openKey = this.secure.allowed_users; 
-    }
+    if (secure) _secure = secure;
 
     this.user_id = user_id || uID();
     this.room_id = '' + room;
@@ -179,9 +176,15 @@ class RTC {
     this.channel = Channel(global.ipfs, room);
 
     this.channel.on('message', rawmsg => {
+      let raw  = {};
       let data = {};
       try {
-        data = JSON.parse(rawmsg.data.toString());
+        raw  = JSON.parse(rawmsg.data.toString());
+        data = raw.data;
+        const sign_mess = raw.sign_mess;
+        if (_secure) {
+          if (!this.validSig(sign_mess, data)) return
+        }
       } catch (e) {
         return
       }
@@ -233,9 +236,20 @@ class RTC {
     });
   }
 
+  validSig (sign_mess, data) {
+    if (_secure) {
+      const hash       = this.web3.utils.soliditySha3(JSON.stringify(data));
+      const recover    = this.web3.eth.accounts.recover(hash, sign_mess.signature);
+      const check_sign = _secure.allowed_users.some(element => {
+        return element.toLowerCase() === recover.toLowerCase()
+      });
+
+      return check_sign
+    }
+  }
+  
   async isAlreadyReceived (data) {
     // isAlreadyReceived(data){
-    console.log(data);
     if (!data.seed || typeof data.seed !== 'string' || data.action === 'delivery_confirmation') {
       return false
     }
@@ -295,26 +309,12 @@ class RTC {
       return
     }
 
-    if (this.secure) {
-      const recover = this.web3.eth.accounts.recover({
-        messageHash: acquired_data.sign_mess.messageHash,
-        v: acquired_data.sign_mess.v,
-        r: acquired_data.sign_mess.r,
-        s: acquired_data.sign_mess.s
-      }).toLowerCase();
-
-      const check_sign = this.secure.allowed_users.some(element => {
-        return element.toLowerCase() === recover.toLowerCase()
-      });
-
-      if (!check_sign) throw new Error('Error invalid sign')
-    }
     
     this.sendMsg({
-      address:  acquired_data.address,
-      seed:     uID(),
-      action:   'delivery_confirmation',
-      message: acquired_data
+      address : acquired_data.address,
+      seed    : uID(),
+      action  : 'delivery_confirmation',
+      message : acquired_data
     });
   }
 
@@ -345,7 +345,7 @@ class RTC {
       this.CheckReceiptsT = {};
     }
 
-    this.CheckReceiptsT[sended_data.seed] = setTimeout(() => {
+    this.CheckReceiptsT[sended_data.data.seed] = setTimeout(() => {
       this.unsubscribe(address, waitReceipt, subscribe_index);
 
       callback(false);
@@ -390,15 +390,21 @@ class RTC {
       return
     }
 
+    let {sign_mess, hash} = false;
     data.seed       = uID();
     data.user_id    = this.user_id;
     // signed message
-    if (this.secure) {
-      data.sign_mess = this.web3.eth.accounts.sign(JSON.stringify(data), this.privateKey);
+    if (_secure) {
+      hash      = this.web3.utils.soliditySha3(JSON.stringify(data));
+      sign_mess = this.web3.eth.accounts.sign(hash, _secure.privateKey);
     }
     // data.room_id = this.room_id
 
-    this.channel.broadcast(JSON.stringify(data));
+    this.channel.broadcast(JSON.stringify({
+      data: data,
+      hash: hash, 
+      sign_mess: sign_mess
+    }));
 
     return data
   }

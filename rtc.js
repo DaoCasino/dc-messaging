@@ -18,8 +18,6 @@ const uID = function () {
 const delivery_timeout = 7000
 const msg_ttl = 10 * 60 * 1000
 let _secure     = false
-let _privateKey = false
-let _openkey    = false
 
 const seedsDB = (function () {
   const store_name = 'rtc_msgs_seeds'
@@ -132,11 +130,7 @@ export class RTC {
     
     this.web3 = new WEB3(new WEB3.providers.HttpProvider('https://ropsten.infura.io/JCnK5ifEPH9qcQkX0Ahl'))
 
-    if (secure) {
-      _secure      = secure
-      _privateKey  = _secure.privateKey
-      _openkey     = _secure.allowed_users 
-    }
+    if (secure) _secure = secure
 
     this.user_id = user_id || uID()
     this.room_id = '' + room
@@ -157,13 +151,14 @@ export class RTC {
     this.channel = Channel(global.ipfs, room)
 
     this.channel.on('message', rawmsg => {
+      let raw  = {}
       let data = {}
       try {
-        data = JSON.parse(rawmsg.data.toString())
-
+        raw  = JSON.parse(rawmsg.data.toString())
+        data = raw.data
+        const sign_mess = raw.sign_mess
         if (_secure) {
-          let sign_mess = data.sign_mess
-          if (!this.validSig(sign_mess)) return
+          if (!this.validSig(sign_mess, data)) return
         }
       } catch (e) {
         return
@@ -216,20 +211,14 @@ export class RTC {
     })
   }
 
-  validSig (sign_mess) {
+  validSig (sign_mess, data) {
     if (_secure) {
-      const recover = this.web3.eth.accounts.recover({
-        messageHash: sign_mess.messageHash,
-        v: sign_mess.v,
-        r: sign_mess.r,
-        s: sign_mess.s
-      }).toLowerCase()
-
-      const check_sign = _openkey.some(element => {
+      const hash       = this.web3.utils.soliditySha3(JSON.stringify(data))
+      const recover    = this.web3.eth.accounts.recover(hash, sign_mess.signature)
+      const check_sign = _secure.allowed_users.some(element => {
         return element.toLowerCase() === recover.toLowerCase()
       })
 
-      if (!check_sign) return false
       return check_sign
     }
   }
@@ -294,6 +283,7 @@ export class RTC {
       acquired_data.action  === 'bankroller_active') {
       return
     }
+
     
     this.sendMsg({
       address : acquired_data.address,
@@ -375,15 +365,21 @@ export class RTC {
       return
     }
 
+    let {sign_mess, hash} = false
     data.seed       = uID()
     data.user_id    = this.user_id
     // signed message
     if (_secure) {
-      data.sign_mess = this.web3.eth.accounts.sign(JSON.stringify(data), _privateKey)
+      hash      = this.web3.utils.soliditySha3(JSON.stringify(data))
+      sign_mess = this.web3.eth.accounts.sign(hash, _secure.privateKey)
     }
     // data.room_id = this.room_id
 
-    this.channel.broadcast(JSON.stringify(data))
+    this.channel.broadcast(JSON.stringify({
+      data: data,
+      hash: hash, 
+      sign_mess: sign_mess
+    }))
 
     return data
   }
