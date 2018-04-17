@@ -8,6 +8,7 @@ var debug = _interopDefault(require('debug'));
 var EE = _interopDefault(require('event-emitter'));
 var IPFS = _interopDefault(require('ipfs'));
 var Channel = _interopDefault(require('ipfs-pubsub-room'));
+var WEB3 = _interopDefault(require('web3'));
 
 const debugLog = function (string, loglevel, enable = true) {
   let log = debug('');
@@ -41,6 +42,7 @@ const uID = function () {
 
 const delivery_timeout = 7000;
 const msg_ttl = 10 * 60 * 1000;
+let _secure     = false;
 
 const seedsDB = (function () {
   const store_name = 'rtc_msgs_seeds';
@@ -139,7 +141,7 @@ function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-
 }
 
 class RTC {
-  constructor (user_id = false, room = false) {
+  constructor (user_id = false, room = false, secure = false) {
     room = room || _config.rtc_room;
 
     const EC = function () {};
@@ -150,6 +152,10 @@ class RTC {
       debugLog('empty room name', 'error');
       return
     }
+    
+    this.web3 = new WEB3(new WEB3.providers.HttpProvider('https://ropsten.infura.io/JCnK5ifEPH9qcQkX0Ahl'));
+
+    if (secure) _secure = secure;
 
     this.user_id = user_id || uID();
     this.room_id = '' + room;
@@ -170,9 +176,15 @@ class RTC {
     this.channel = Channel(global.ipfs, room);
 
     this.channel.on('message', rawmsg => {
+      let raw  = {};
       let data = {};
       try {
-        data = JSON.parse(rawmsg.data.toString());
+        raw  = JSON.parse(rawmsg.data.toString());
+        data = raw.data;
+        const sign_mess = raw.sign_mess;
+        if (_secure) {
+          if (!this.validSig(sign_mess, data)) return
+        }
       } catch (e) {
         return
       }
@@ -224,6 +236,18 @@ class RTC {
     });
   }
 
+  validSig (sign_mess, data) {
+    if (_secure) {
+      const hash       = this.web3.utils.soliditySha3(JSON.stringify(data));
+      const recover    = this.web3.eth.accounts.recover(hash, sign_mess.signature);
+      const check_sign = _secure.allowed_users.some(element => {
+        return element.toLowerCase() === recover.toLowerCase()
+      });
+
+      return check_sign
+    }
+  }
+  
   async isAlreadyReceived (data) {
     // isAlreadyReceived(data){
     if (!data.seed || typeof data.seed !== 'string' || data.action === 'delivery_confirmation') {
@@ -285,25 +309,26 @@ class RTC {
       return
     }
 
+    
     this.sendMsg({
-      address:  acquired_data.address,
-      seed:     uID(),
-      action:   'delivery_confirmation',
-      acquired: acquired_data
+      address : acquired_data.address,
+      seed    : uID(),
+      action  : 'delivery_confirmation',
+      message : acquired_data
     });
   }
 
   // Проверка получения отправленного сообщения
   CheckReceipt (sended_data, callback) {
     let subscribe_index = false;
-
     let address = sended_data.address;
+
     let waitReceipt = data => {
       if (!data.action || data.action !== 'delivery_confirmation') {
         return
       }
 
-      if (this.equaMsgs(sended_data, data.acquired)) {
+      if (this.equaMsgs(sended_data, data.message)) {
         this.unsubscribe(address, waitReceipt, subscribe_index);
 
         if (this.CheckReceiptsT[sended_data.seed]) {
@@ -320,7 +345,7 @@ class RTC {
       this.CheckReceiptsT = {};
     }
 
-    this.CheckReceiptsT[sended_data.seed] = setTimeout(() => {
+    this.CheckReceiptsT[sended_data.data.seed] = setTimeout(() => {
       this.unsubscribe(address, waitReceipt, subscribe_index);
 
       callback(false);
@@ -365,11 +390,21 @@ class RTC {
       return
     }
 
+    let {sign_mess, hash} = false;
     data.seed       = uID();
     data.user_id    = this.user_id;
+    // signed message
+    if (_secure) {
+      hash      = this.web3.utils.soliditySha3(JSON.stringify(data));
+      sign_mess = this.web3.eth.accounts.sign(hash, _secure.privateKey);
+    }
     // data.room_id = this.room_id
 
-    this.channel.broadcast(JSON.stringify(data));
+    this.channel.broadcast(JSON.stringify({
+      data: data,
+      hash: hash, 
+      sign_mess: sign_mess
+    }));
 
     return data
   }

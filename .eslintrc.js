@@ -9,6 +9,7 @@ module.exports = {
         'no-multi-spaces'              : ['off'],
         'key-spacing'                  : ['off'],
         'camelcase'                    : ['off'],
+        'no-useles-return'             : ['off'],
         'standard/no-callback-literal' : ['off'],
         'no-multiple-empty-lines'      : ['off'],
         'space-in-parens'              : ['off'],
