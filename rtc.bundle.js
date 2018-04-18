@@ -345,7 +345,7 @@ class RTC {
       this.CheckReceiptsT = {};
     }
 
-    this.CheckReceiptsT[sended_data.data.seed] = setTimeout(() => {
+    this.CheckReceiptsT[sended_data.seed] = setTimeout(() => {
       this.unsubscribe(address, waitReceipt, subscribe_index);
 
       callback(false);
