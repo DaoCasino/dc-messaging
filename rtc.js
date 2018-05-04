@@ -17,7 +17,6 @@ const uID = function () {
 
 const delivery_timeout = 7000
 const msg_ttl = 10 * 60 * 1000
-let _secure     = false
 
 const seedsDB = (function () {
   const store_name = 'rtc_msgs_seeds'
@@ -130,7 +129,7 @@ export class RTC {
     
     this.web3 = new WEB3(new WEB3.providers.HttpProvider('https://ropsten.infura.io/JCnK5ifEPH9qcQkX0Ahl'))
 
-    if (secure) _secure = secure
+    if (secure) this._secure = secure
 
     this.user_id = user_id || uID()
     this.room_id = '' + room
@@ -157,7 +156,7 @@ export class RTC {
         raw  = JSON.parse(rawmsg.data.toString())
         data = raw.data
         const sign_mess = raw.sign_mess
-        if (_secure) {
+        if (this._secure) {
           if (!this.validSig(sign_mess, data)) return
         }
       } catch (e) {
@@ -212,10 +211,10 @@ export class RTC {
   }
 
   validSig (sign_mess, data) {
-    if (_secure) {
+    if (this._secure) {
       const hash       = this.web3.utils.soliditySha3(JSON.stringify(data))
       const recover    = this.web3.eth.accounts.recover(hash, sign_mess.signature)
-      const check_sign = _secure.allowed_users.some(element => {
+      const check_sign = this._secure.allowed_users.some(element => {
         return element.toLowerCase() === recover.toLowerCase()
       })
 
@@ -369,9 +368,9 @@ export class RTC {
     data.seed       = uID()
     data.user_id    = this.user_id
     // signed message
-    if (_secure) {
+    if (this._secure) {
       hash      = this.web3.utils.soliditySha3(JSON.stringify(data))
-      sign_mess = this.web3.eth.accounts.sign(hash, _secure.privateKey)
+      sign_mess = this.web3.eth.accounts.sign(hash, this._secure.privateKey)
     }
     // data.room_id = this.room_id
 
