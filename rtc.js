@@ -15,7 +15,7 @@ const uID = function () {
   return '_' + Math.random().toString(36).substr(2, 9)
 }
 
-const delivery_timeout = 7000
+const delivery_timeout = 15000
 const msg_ttl = 10 * 60 * 1000
 
 const seedsDB = (function () {
