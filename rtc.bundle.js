@@ -173,7 +173,7 @@ class RTC {
     }
     debugLog('room:' + room, _config.loglevel);
     this.channel = Channel(global.ipfs, room);
-
+    this.channel.setMaxListeners(0);
     this.channel.on('message', rawmsg => {
       let raw  = {};
       let data = {};
