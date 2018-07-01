@@ -4,6 +4,7 @@ import EE         from 'event-emitter'
 import IPFS       from 'ipfs'
 import Channel    from 'ipfs-pubsub-room'
 import WEB3       from 'web3'
+import pacJson    from 'package.json'
 import * as Utils from './utils'
 
 const _config = {
@@ -84,6 +85,7 @@ if (process.env.NODE_ENV === 'test') {
 //   ]
 // }
 
+export const version = pacJson.version
 export function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star') {
   try {
 
