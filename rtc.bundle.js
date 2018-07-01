@@ -9,7 +9,6 @@ var EE = _interopDefault(require('event-emitter'));
 var IPFS = _interopDefault(require('ipfs'));
 var Channel = _interopDefault(require('ipfs-pubsub-room'));
 var WEB3 = _interopDefault(require('web3'));
-var pacJson = _interopDefault(require('package.json'));
 
 const debugLog = function (string, loglevel, enable = true) {
   let log = debug('');
@@ -110,7 +109,7 @@ if (process.env.NODE_ENV === 'test') {
 //   ]
 // }
 
-const version = pacJson.version;
+const version = require('./package.json').version;
 function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star') {
   try {
 
