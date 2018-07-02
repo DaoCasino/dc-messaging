@@ -109,6 +109,7 @@ if (process.env.NODE_ENV === 'test') {
 //   ]
 // }
 
+const version = require('./package.json').version;
 function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star') {
   try {
 
@@ -356,7 +357,7 @@ class RTC {
   }
 
   // Отправка сообщения с ожидание подтверждения получения
-  send (data, callback = false, repeat = 5) {
+  send (data, callback = false, repeat = 9) {
     if (!this.channel) {
       setTimeout(() => { this.send(data, callback); }, 1000);
       return
@@ -371,7 +372,9 @@ class RTC {
     this.CheckReceipt(data, delivered => {
       if (!delivered && repeat > 0) {
         repeat--;
-        this.send(data, callback, repeat);
+        setTimeout(() => {
+          this.send(data, callback, repeat);
+        }, 200 * repeat);
         return
       }
 
@@ -409,5 +412,6 @@ class RTC {
   }
 }
 
+exports.version = version;
 exports.upIPFS = upIPFS;
 exports.RTC = RTC;
