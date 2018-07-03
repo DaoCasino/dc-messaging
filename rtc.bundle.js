@@ -93,34 +93,23 @@ const seedsDB = (function () {
 
 let ipfs_connected = false;
 
-let repo = './data/messaging/DataBase';
+let default_repo = './data/messaging/DataBase';
 if (process.env.NODE_ENV === 'test') {
-  repo += Math.ceil( Math.random() * 10000 );
+  default_repo += Math.ceil( Math.random() * 10000 );
 }
 
-
-// let swarmlist = [
-//   '/ip4/46.101.244.101/tcp/9090/ws/p2p-websocket-star/'
-//   // '/ip4/146.185.173.84/tcp/9090/ws/p2p-websocket-star/'
-// ]
-// if (process.env.DC_NETWORK === 'local') {
-//   swarmlist = [
-//     '/ip4/127.0.0.1/tcp/9090/ws/p2p-websocket-star/'
-//   ]
-// }
-
 const version = require('./package.json').version;
-function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star') {
-  try {
+function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star', repo=false) {
 
-    let server = swarmlist;
-    if (!Array.isArray(swarmlist)) {
-      server = [];
-      server.push(swarmlist);
-    } 
-    
+  let server = swarmlist;
+  if (!Array.isArray(swarmlist)) {
+    server = [];
+    server.push(swarmlist);
+  } 
+
+  try {
     global.ipfs = new IPFS({
-      repo: repo,
+      repo: (repo || default_repo),
       EXPERIMENTAL: {
         pubsub: true
       },
@@ -136,7 +125,7 @@ function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-
 
   } catch (err) {
     debugLog('Restart IPFS ' + err, 'error');
-    upIPFS(swarmlist);
+    upIPFS(swarmlist, repo);
   }
 }
 
@@ -263,7 +252,7 @@ class RTC {
   }
 
   isFreshSeed (time) {
-    let ttl = msg_ttl || 7 * 1000;
+    let ttl = msg_ttl;
     let livetime = (new Date().getTime()) - time * 1;
     return (livetime < ttl)
   }

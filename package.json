@@ -31,7 +31,7 @@
     "babel-preset-env": "^1.6.1",
     "cz-conventional-changelog": "^2.1.0",
     "random-object-generator": "^1.0.2",
-    "rollup": "^0.56.3"
+    "rollup": "^0.62.0"
   },
   "config": {
     "commitizen": {
