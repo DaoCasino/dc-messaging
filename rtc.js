@@ -338,7 +338,7 @@ export class RTC {
         repeat--
         setTimeout(() => {
           this.send(data, callback, repeat)
-        }, 200 * repeat)
+        }, 1000 )
         return
       }
 
