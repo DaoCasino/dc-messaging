@@ -23,7 +23,7 @@ function anotherTestObject () {
 
 SharedRoom.on('action::getAddress', data => {
   allow_address.push(data.address)
-  console.log('peer2', allow_address)
+  // console.log('peer2', allow_address)
   SharedRoom.sendMsg({action: 'getAddress', address :account.address})
   
   const Room = new messaging.RTC(account.address, 'GameRoom', {
@@ -32,7 +32,7 @@ SharedRoom.on('action::getAddress', data => {
   })
 
   Room.on('action::ping', data => {
-    console.log(data.message)
+    // console.log(data.message)
     setTimeout(() => {
       Room.sendMsg({action: 'ping', message:random.randomObject(new testObject())})
     }, 777)

@@ -27,7 +27,7 @@ setTimeout(() => {
 
 SharedRoom.on('action::getAddress', data => {
   allow_address.push(data.address)
-  console.log('peer1', allow_address)
+  // console.log('peer1', allow_address)
   
   const Room = new messaging.RTC(account.address, 'GameRoom', {
     privateKey    : account.privateKey,
@@ -39,7 +39,7 @@ SharedRoom.on('action::getAddress', data => {
   }, 15000)
 
   Room.on('action::ping', data => {
-    console.log(data.message)
+    // console.log(data.message)
     setTimeout(() => {
       Room.sendMsg({action: 'ping', message:random.randomObject(new testObject())})
     }, 555)

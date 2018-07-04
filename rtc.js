@@ -74,7 +74,7 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 export const version = require('./package.json').version
-export function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star', repo=false) {
+export function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star', repo = false) {
 
   let server = swarmlist
   if (!Array.isArray(swarmlist)) {
@@ -136,9 +136,10 @@ export class RTC {
       }, 999)
       return
     }
+
     Utils.debugLog('room:' + room, _config.loglevel)
     this.channel = Channel(global.ipfs, room)
-    this.channel.setMaxListeners(0)
+    this.channel.setMaxListeners(Infinity)
     this.channel.on('message', rawmsg => {
       let raw  = {}
       let data = {}
