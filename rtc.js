@@ -328,6 +328,10 @@ export class RTC {
       return
     }
 
+    if (data.action === 'connect' && data.user_id !== data.player) {
+      return
+    }
+
     data = this.sendMsg(data)
 
     if (!data.address) {

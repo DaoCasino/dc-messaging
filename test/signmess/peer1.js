@@ -35,7 +35,7 @@ SharedRoom.on('action::getAddress', data => {
   })
 
   setTimeout(() => {
-    Room.sendMsg({action: 'ping', message:random.randomObject(new testObject())})
+    Room.sendMsg({action: 'connect', message:random.randomObject(new testObject())})
   }, 15000)
 
   Room.on('action::ping', data => {

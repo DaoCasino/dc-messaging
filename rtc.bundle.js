@@ -99,7 +99,7 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 const version = require('./package.json').version;
-function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star', repo=false) {
+function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star', repo = false) {
 
   let server = swarmlist;
   if (!Array.isArray(swarmlist)) {
@@ -161,9 +161,10 @@ class RTC {
       }, 999);
       return
     }
+
     debugLog('room:' + room, _config.loglevel);
     this.channel = Channel(global.ipfs, room);
-    this.channel.setMaxListeners(0);
+    this.channel.setMaxListeners(Infinity);
     this.channel.on('message', rawmsg => {
       let raw  = {};
       let data = {};
@@ -349,6 +350,10 @@ class RTC {
   send (data, callback = false, repeat = 9) {
     if (!this.channel) {
       setTimeout(() => { this.send(data, callback); }, 1000);
+      return
+    }
+
+    if (data.action === 'connect' && data.user_id !== data.player) {
       return
     }
 
