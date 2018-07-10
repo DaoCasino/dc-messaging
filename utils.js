@@ -1,4 +1,6 @@
 import debug from 'debug'
+import fs    from 'fs'
+import path  from 'path'
 
 export const debugLog = function (string, loglevel, enable = true) {
   let log = debug('')
@@ -17,4 +19,16 @@ export const debugLog = function (string, loglevel, enable = true) {
   if (loglevel === 'none')  log.enabled = false
 
   return log(string)
+}
+
+export const deleteFolderRecursive = dirpath => {
+  fs.readdirSync(dirpath).forEach((file, index) => {
+    const curPath = path.join(dirpath, file);
+
+    (fs.lstatSync(curPath).isDirectory())
+      ? deleteFolderRecursive(curPath)
+      : fs.unlinkSync(curPath)
+  })
+
+  fs.rmdirSync(dirpath)
 }
