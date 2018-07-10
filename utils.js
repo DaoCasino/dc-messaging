@@ -32,3 +32,12 @@ export const deleteFolderRecursive = dirpath => {
 
   fs.rmdirSync(dirpath)
 }
+
+export const createRepo = (dirpath = './data/messaging/DataBase') => {
+  let pathToRepo = dirpath
+  if (process.env.NODE_ENV === 'test') {
+    pathToRepo += Math.ceil( Math.random() * 10000)
+  }
+
+  return pathToRepo
+}

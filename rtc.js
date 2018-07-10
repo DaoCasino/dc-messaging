@@ -65,18 +65,8 @@ const seedsDB = (function () {
   }
 })()
 
-function createRepo (dirpath = './data/messaging/DataBase') {
-  let pathToRepo = dirpath
-  if (process.env.NODE_ENV === 'test') {
-    pathToRepo += Math.ceil( Math.random() * 10000)
-  }
-
-  return pathToRepo
-}
-
 let ipfs_connected   = false
-let DeleteFolderflag = false
-let repo = createRepo()
+let repo = Utils.createRepo()
 
 export function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star') {
   let server = swarmlist
@@ -99,22 +89,21 @@ export function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/w
         Swarm: server
       }
     }
-  }).on('error', async err => {
-    if (typeof err.description !== 'undefined') {
-      for (let i = 0; i < server.length; i++) {
-        if (server[i].indexOf(err.description.host) !== -1) {
+  }).on('error', err => {
+    if (err.message === 'websocket error' &&
+    typeof err.description !== 'undefined') {
+      server.forEach((el, i) => {
+        (el.indexOf(err.description.host) !== -1) &&
           server.splice(i, 1)
-        } 
-      }
+      })  
+      
+      setTimeout(() => {
+        Utils.deleteFolderRecursive(repo)
+        repo = Utils.createRepo()
+        
+        upIPFS(server)
+      }, 1000)
     }
-    
-    if (DeleteFolderflag) return
-    DeleteFolderflag = true
-
-    Utils.deleteFolderRecursive(repo)
-    repo = createRepo()
-
-    setTimeout(() => upIPFS(server), 1000)
   }).on('ready', () => {
     ipfs_connected = true
   })
