@@ -1,5 +1,5 @@
 /* global localStorage */
-
+import path       from 'path'
 import EE         from 'event-emitter'
 import IPFS       from 'ipfs'
 import Channel    from 'ipfs-pubsub-room'
@@ -66,42 +66,53 @@ const seedsDB = (function () {
   }
 })()
 
-let ipfs_connected = false
+let ipfs_connected   = false
+let repo = Utils.createRepo()
 
-let default_repo = './data/messaging/DataBase'
-if (process.env.NODE_ENV === 'test') {
-  default_repo += Math.ceil( Math.random() * 10000 )
-}
+let server = [
+  '/dns4/signal1.dao.casino/tcp/443/wss/p2p-websocket-star/',
+  '/dns4/signal2.dao.casino/tcp/443/wss/p2p-websocket-star/',
+  '/dns4/signal3.dao.casino/tcp/443/wss/p2p-websocket-star/'
+]
 
-export const version = require('./package.json').version
-export function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star', repo = false) {
+export function upIPFS (yourSwarm, swarmlist = server) {
+  let checkServer = false
 
-  let server = swarmlist
-  if (!Array.isArray(swarmlist)) {
-    server = []
-    server.push(swarmlist)
-  } 
-
-  try {
-    global.ipfs = new IPFS({
-      repo: (repo || default_repo),
-      EXPERIMENTAL: {
-        pubsub: true
-      },
-      config: {
-        Addresses: {
-          Swarm: server
-        }
-      }
-    })
-    global.ipfs.on('ready', () => {
-      ipfs_connected = true
-    })
-
-  } catch (err) {
-    Utils.debugLog('Restart IPFS ' + err, 'error')
-    upIPFS(swarmlist, repo)
+  if (yourSwarm) {
+    swarmlist.push(yourSwarm)
   }
+
+  global.ipfs = new IPFS({
+    repo: repo,
+    EXPERIMENTAL: {
+      pubsub: true
+    },
+    config: {
+      Addresses: {
+        Swarm: swarmlist
+      }
+    }
+  }).on('error', async err => {
+    if (err.message === 'websocket error' &&
+    typeof err.description !== 'undefined') {
+      console.log(err.description.host)
+      server.forEach((el, i) => {
+        (el.indexOf(err.description.host) !== -1) &&
+          server.splice(i, 1)
+      })
+      
+      if (checkServer) return
+      checkServer = true
+
+      setTimeout(() => { 
+        Utils.deleteFolderRecursive(path.join(__dirname, 'data/'))
+        repo = Utils.createRepo()
+        upIPFS(yourSwarm, server)
+      }, 1000)
+    }
+  }).on('ready', () => {
+    ipfs_connected = true
+  })
 }
 
 export class RTC {

@@ -5,6 +5,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var debug = _interopDefault(require('debug'));
+var fs = _interopDefault(require('fs'));
+var path = _interopDefault(require('path'));
 var EE = _interopDefault(require('event-emitter'));
 var IPFS = _interopDefault(require('ipfs'));
 var Channel = _interopDefault(require('ipfs-pubsub-room'));
@@ -27,6 +29,27 @@ const debugLog = function (string, loglevel, enable = true) {
   if (loglevel === 'none')  log.enabled = false;
 
   return log(string)
+};
+
+const deleteFolderRecursive = dirpath => {
+  fs.readdirSync(dirpath).forEach((file, index) => {
+    const curPath = path.join(dirpath, file);
+
+    (fs.lstatSync(curPath).isDirectory())
+      ? deleteFolderRecursive(curPath)
+      : fs.unlinkSync(curPath);
+  });
+
+  fs.rmdirSync(dirpath);
+};
+
+const createRepo = (dirpath = './data/messaging/DataBase') => {
+  let pathToRepo = dirpath;
+  if (process.env.NODE_ENV === 'test') {
+    pathToRepo += Math.ceil( Math.random() * 10000);
+  }
+
+  return pathToRepo
 };
 
 /* global localStorage */
@@ -91,42 +114,53 @@ const seedsDB = (function () {
   }
 })();
 
-let ipfs_connected = false;
+let ipfs_connected   = false;
+let repo = createRepo();
 
-let default_repo = './data/messaging/DataBase';
-if (process.env.NODE_ENV === 'test') {
-  default_repo += Math.ceil( Math.random() * 10000 );
-}
+let server = [
+  '/dns4/signal1.dao.casino/tcp/443/wss/p2p-websocket-star/',
+  '/dns4/signal2.dao.casino/tcp/443/wss/p2p-websocket-star/',
+  '/dns4/signal3.dao.casino/tcp/443/wss/p2p-websocket-star/'
+];
 
-const version = require('./package.json').version;
-function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star', repo = false) {
+function upIPFS (yourSwarm, swarmlist = server) {
+  let checkServer = false;
 
-  let server = swarmlist;
-  if (!Array.isArray(swarmlist)) {
-    server = [];
-    server.push(swarmlist);
-  } 
-
-  try {
-    global.ipfs = new IPFS({
-      repo: (repo || default_repo),
-      EXPERIMENTAL: {
-        pubsub: true
-      },
-      config: {
-        Addresses: {
-          Swarm: server
-        }
-      }
-    });
-    global.ipfs.on('ready', () => {
-      ipfs_connected = true;
-    });
-
-  } catch (err) {
-    debugLog('Restart IPFS ' + err, 'error');
-    upIPFS(swarmlist, repo);
+  if (yourSwarm) {
+    swarmlist.push(yourSwarm);
   }
+
+  global.ipfs = new IPFS({
+    repo: repo,
+    EXPERIMENTAL: {
+      pubsub: true
+    },
+    config: {
+      Addresses: {
+        Swarm: swarmlist
+      }
+    }
+  }).on('error', async err => {
+    if (err.message === 'websocket error' &&
+    typeof err.description !== 'undefined') {
+      console.log(err.description.host);
+      server.forEach((el, i) => {
+        (el.indexOf(err.description.host) !== -1) &&
+          server.splice(i, 1);
+      });
+      
+      if (checkServer) return
+      checkServer = true;
+
+      setTimeout(() => { 
+        deleteFolderRecursive(path.join(__dirname, 'data/'));
+        repo = createRepo();
+        upIPFS(yourSwarm, server);
+      }, 1000);
+    }
+  }).on('ready', () => {
+    ipfs_connected = true;
+  });
 }
 
 class RTC {
@@ -253,7 +287,7 @@ class RTC {
   }
 
   isFreshSeed (time) {
-    let ttl = msg_ttl;
+    let ttl = msg_ttl || 7 * 1000;
     let livetime = (new Date().getTime()) - time * 1;
     return (livetime < ttl)
   }
@@ -406,6 +440,5 @@ class RTC {
   }
 }
 
-exports.version = version;
 exports.upIPFS = upIPFS;
 exports.RTC = RTC;
