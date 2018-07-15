@@ -74,8 +74,8 @@ let server = [
   '/dns4/signal3.dao.casino/tcp/443/wss/p2p-websocket-star/'
 ]
 
-export function upIPFS (yourSwarm, swarmlist = server) {
-  (yourSwarm) && swarmlist.push(yourSwarm)
+export function upIPFS (yourSwarm) {
+  (yourSwarm) && server.push(yourSwarm)
 
   global.ipfs = new IPFS({
     repo: repo,
@@ -84,7 +84,7 @@ export function upIPFS (yourSwarm, swarmlist = server) {
     },
     config: {
       Addresses: {
-        Swarm: swarmlist
+        Swarm: server
       }
     }
   }).on('ready', () => {
