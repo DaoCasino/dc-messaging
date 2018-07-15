@@ -5,12 +5,15 @@ Object.defineProperty(exports, '__esModule', { value: true });
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var debug = _interopDefault(require('debug'));
-var fs = _interopDefault(require('fs'));
-var path = _interopDefault(require('path'));
+require('fs');
+require('path');
+require('multiaddr');
+require('libp2p-websockets');
 var EE = _interopDefault(require('event-emitter'));
 var IPFS = _interopDefault(require('ipfs'));
 var Channel = _interopDefault(require('ipfs-pubsub-room'));
 var WEB3 = _interopDefault(require('web3'));
+require('readline');
 
 const debugLog = function (string, loglevel, enable = true) {
   let log = debug('');
@@ -29,18 +32,6 @@ const debugLog = function (string, loglevel, enable = true) {
   if (loglevel === 'none')  log.enabled = false;
 
   return log(string)
-};
-
-const deleteFolderRecursive = dirpath => {
-  fs.readdirSync(dirpath).forEach((file, index) => {
-    const curPath = path.join(dirpath, file);
-
-    (fs.lstatSync(curPath).isDirectory())
-      ? deleteFolderRecursive(curPath)
-      : fs.unlinkSync(curPath);
-  });
-
-  fs.rmdirSync(dirpath);
 };
 
 const createRepo = (dirpath = './data/messaging/DataBase') => {
@@ -114,7 +105,7 @@ const seedsDB = (function () {
   }
 })();
 
-let ipfs_connected   = false;
+let ipfs_connected = false;
 let repo = createRepo();
 
 let server = [
@@ -124,11 +115,7 @@ let server = [
 ];
 
 function upIPFS (yourSwarm, swarmlist = server) {
-  let checkServer = false;
-
-  if (yourSwarm) {
-    swarmlist.push(yourSwarm);
-  }
+  // (yourSwarm) && swarmlist.push(yourSwarm)
 
   global.ipfs = new IPFS({
     repo: repo,
@@ -140,26 +127,10 @@ function upIPFS (yourSwarm, swarmlist = server) {
         Swarm: swarmlist
       }
     }
-  }).on('error', async err => {
-    if (err.message === 'websocket error' &&
-    typeof err.description !== 'undefined') {
-      console.log(err.description.host);
-      server.forEach((el, i) => {
-        (el.indexOf(err.description.host) !== -1) &&
-          server.splice(i, 1);
-      });
-      
-      if (checkServer) return
-      checkServer = true;
-
-      setTimeout(() => { 
-        deleteFolderRecursive(path.join(__dirname, 'data/'));
-        repo = createRepo();
-        upIPFS(yourSwarm, server);
-      }, 1000);
-    }
   }).on('ready', () => {
     ipfs_connected = true;
+  }).on('error', err => {
+    console.log(err);
   });
 }
 
@@ -287,7 +258,7 @@ class RTC {
   }
 
   isFreshSeed (time) {
-    let ttl = msg_ttl || 7 * 1000;
+    let ttl = msg_ttl;
     let livetime = (new Date().getTime()) - time * 1;
     return (livetime < ttl)
   }

@@ -1,10 +1,13 @@
 /* global localStorage */
 import path       from 'path'
+import multiaddr  from 'multiaddr'
+import WS         from 'libp2p-websockets'
 import EE         from 'event-emitter'
 import IPFS       from 'ipfs'
 import Channel    from 'ipfs-pubsub-room'
 import WEB3       from 'web3'
 import * as Utils from './utils'
+import { clearLine } from 'readline'
 
 const _config = {
   rtc_room: 'default_room_name',
@@ -66,7 +69,7 @@ const seedsDB = (function () {
   }
 })()
 
-let ipfs_connected   = false
+let ipfs_connected = false
 let repo = Utils.createRepo()
 
 let server = [
@@ -76,11 +79,7 @@ let server = [
 ]
 
 export function upIPFS (yourSwarm, swarmlist = server) {
-  let checkServer = false
-
-  if (yourSwarm) {
-    swarmlist.push(yourSwarm)
-  }
+  // (yourSwarm) && swarmlist.push(yourSwarm)
 
   global.ipfs = new IPFS({
     repo: repo,
@@ -92,26 +91,10 @@ export function upIPFS (yourSwarm, swarmlist = server) {
         Swarm: swarmlist
       }
     }
-  }).on('error', async err => {
-    if (err.message === 'websocket error' &&
-    typeof err.description !== 'undefined') {
-      console.log(err.description.host)
-      server.forEach((el, i) => {
-        (el.indexOf(err.description.host) !== -1) &&
-          server.splice(i, 1)
-      })
-      
-      if (checkServer) return
-      checkServer = true
-
-      setTimeout(() => { 
-        Utils.deleteFolderRecursive(path.join(__dirname, 'data/'))
-        repo = Utils.createRepo()
-        upIPFS(yourSwarm, server)
-      }, 1000)
-    }
   }).on('ready', () => {
     ipfs_connected = true
+  }).on('error', err => {
+    console.log(err)
   })
 }
 
