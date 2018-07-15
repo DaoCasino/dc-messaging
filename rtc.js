@@ -1,13 +1,9 @@
 /* global localStorage */
-import path       from 'path'
-import multiaddr  from 'multiaddr'
-import WS         from 'libp2p-websockets'
 import EE         from 'event-emitter'
 import IPFS       from 'ipfs'
 import Channel    from 'ipfs-pubsub-room'
 import WEB3       from 'web3'
 import * as Utils from './utils'
-import { clearLine } from 'readline'
 
 const _config = {
   rtc_room: 'default_room_name',
@@ -79,7 +75,7 @@ let server = [
 ]
 
 export function upIPFS (yourSwarm, swarmlist = server) {
-  // (yourSwarm) && swarmlist.push(yourSwarm)
+  (yourSwarm) && swarmlist.push(yourSwarm)
 
   global.ipfs = new IPFS({
     repo: repo,

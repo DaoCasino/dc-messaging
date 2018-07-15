@@ -7,13 +7,10 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var debug = _interopDefault(require('debug'));
 require('fs');
 require('path');
-require('multiaddr');
-require('libp2p-websockets');
 var EE = _interopDefault(require('event-emitter'));
 var IPFS = _interopDefault(require('ipfs'));
 var Channel = _interopDefault(require('ipfs-pubsub-room'));
 var WEB3 = _interopDefault(require('web3'));
-require('readline');
 
 const debugLog = function (string, loglevel, enable = true) {
   let log = debug('');
@@ -115,7 +112,7 @@ let server = [
 ];
 
 function upIPFS (yourSwarm, swarmlist = server) {
-  // (yourSwarm) && swarmlist.push(yourSwarm)
+  (yourSwarm) && swarmlist.push(yourSwarm);
 
   global.ipfs = new IPFS({
     repo: repo,
