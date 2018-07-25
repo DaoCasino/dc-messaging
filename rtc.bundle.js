@@ -111,8 +111,17 @@ let server = [
   '/dns4/signal3.dao.casino/tcp/443/wss/p2p-websocket-star/'
 ];
 
+const version = require('./package.json').version;
+
 function upIPFS (yourSwarm) {
-  (yourSwarm) && server.push(yourSwarm);
+  if ((!process.env.DC_NETWORK ||
+    process.env.DC_NETWORK !== 'local') &&
+    typeof yourSwarm !== 'undefined'
+  ) {
+    server.push(yourSwarm.swarm);
+  } else {
+    server = [yourSwarm];
+  }
 
   global.ipfs = new IPFS({
     repo: repo,
@@ -408,5 +417,6 @@ class RTC {
   }
 }
 
+exports.version = version;
 exports.upIPFS = upIPFS;
 exports.RTC = RTC;
