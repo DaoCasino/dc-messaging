@@ -77,14 +77,14 @@ let server = [
 export const version = require('./package.json').version
 
 export function upIPFS (yourSwarm) {
-  if ((!process.env.DC_NETWORK ||
-    process.env.DC_NETWORK !== 'local') &&
-    typeof yourSwarm !== 'undefined'
-  ) {
-    server.push(yourSwarm.swarm)
-  } else {
-    server = [yourSwarm]
-  }
+  // if ((!process.env.DC_NETWORK ||
+  //   process.env.DC_NETWORK !== 'local') &&
+  //   typeof yourSwarm !== 'undefined'
+  // ) {
+  //   server.push(yourSwarm.swarm)
+  // } else {
+  //   server = [yourSwarm]
+  // }
 
   global.ipfs = new IPFS({
     repo: repo,

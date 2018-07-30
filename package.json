@@ -22,9 +22,9 @@
   "dependencies": {
     "debug": "^3.1.0",
     "event-emitter": "^0.3.5",
-    "ipfs": "github:DaoCasino/js-ipfs#dc-patch-1",
-    "ipfs-pubsub-room": "DaoCasino/ipfs-pubsub-room",
-    "libp2p": "github:DaoCasino/js-libp2p#dc-patch-1",
+    "ipfs": "github:DaoCasino/js-ipfs#dc-patch-2",
+    "ipfs-pubsub-room": "DaoCasino/ipfs-pubsub-room#dc-patch-1",
+    "libp2p": "github:DaoCasino/js-libp2p#dc-patch-2",
     "web3": "^1.0.0-beta.33"
   },
   "devDependencies": {
