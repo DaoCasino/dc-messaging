@@ -1,10 +1,10 @@
 /* global localStorage */
-
-import EE         from 'event-emitter'
-import IPFS       from 'ipfs'
-import Channel    from 'ipfs-pubsub-room'
-import WEB3       from 'web3'
-import * as Utils from './utils'
+import EE             from 'event-emitter'
+import IPFS           from 'ipfs'
+import Channel        from 'ipfs-pubsub-room'
+import web3Acc        from 'web3-eth-accounts'
+import * as Utils     from './utils'
+import * as web3Utils from 'web3-utils'
 
 const _config = {
   rtc_room: 'default_room_name',
@@ -67,41 +67,34 @@ const seedsDB = (function () {
 })()
 
 let ipfs_connected = false
+let repo = Utils.createRepo()
 
-let default_repo = './data/messaging/DataBase'
-if (process.env.NODE_ENV === 'test') {
-  default_repo += Math.ceil( Math.random() * 10000 )
-}
+let server = [
+  '/dns4/signal1.dao.casino/tcp/443/wss/p2p-websocket-star/',
+  '/dns4/signal2.dao.casino/tcp/443/wss/p2p-websocket-star/',
+  '/dns4/signal3.dao.casino/tcp/443/wss/p2p-websocket-star/'
+]
 
 export const version = require('./package.json').version
-export function upIPFS (swarmlist = '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star', repo=false) {
 
-  let server = swarmlist
-  if (!Array.isArray(swarmlist)) {
-    server = []
-    server.push(swarmlist)
-  } 
+export function upIPFS (yourSwarm) {
+  if (yourSwarm) server.push(yourSwarm)
 
-  try {
-    global.ipfs = new IPFS({
-      repo: (repo || default_repo),
-      EXPERIMENTAL: {
-        pubsub: true
-      },
-      config: {
-        Addresses: {
-          Swarm: server
-        }
+  global.ipfs = new IPFS({
+    repo: repo,
+    EXPERIMENTAL: {
+      pubsub: true
+    },
+    config: {
+      Addresses: {
+        Swarm: server
       }
-    })
-    global.ipfs.on('ready', () => {
-      ipfs_connected = true
-    })
-
-  } catch (err) {
-    Utils.debugLog('Restart IPFS ' + err, 'error')
-    upIPFS(swarmlist, repo)
-  }
+    }
+  }).on('ready', () => {
+    ipfs_connected = true
+  }).on('error', err => {
+    console.log(err)
+  })
 }
 
 export class RTC {
@@ -117,7 +110,7 @@ export class RTC {
       return
     }
     
-    this.web3 = new WEB3(new WEB3.providers.HttpProvider('https://ropsten.infura.io/JCnK5ifEPH9qcQkX0Ahl'))
+    this.Account = new web3Acc()
 
     if (secure) this._secure = secure
 
@@ -136,9 +129,10 @@ export class RTC {
       }, 999)
       return
     }
+
     Utils.debugLog('room:' + room, _config.loglevel)
     this.channel = Channel(global.ipfs, room)
-    this.channel.setMaxListeners(0)
+    this.channel.setMaxListeners(Infinity)
     this.channel.on('message', rawmsg => {
       let raw  = {}
       let data = {}
@@ -202,8 +196,8 @@ export class RTC {
 
   validSig (sign_mess, data) {
     if (this._secure) {
-      const hash       = this.web3.utils.soliditySha3(JSON.stringify(data))
-      const recover    = this.web3.eth.accounts.recover(hash, sign_mess.signature)
+      const hash       = web3Utils.soliditySha3(JSON.stringify(data))
+      const recover    = this.Account.recover(hash, sign_mess.signature)
       const check_sign = this._secure.allowed_users.some(element => {
         return element.toLowerCase() === recover.toLowerCase()
       })
@@ -327,6 +321,10 @@ export class RTC {
       return
     }
 
+    if (data.action === 'connect' && data.user_id !== data.player) {
+      return
+    }
+
     data = this.sendMsg(data)
 
     if (!data.address) {
@@ -338,7 +336,7 @@ export class RTC {
         repeat--
         setTimeout(() => {
           this.send(data, callback, repeat)
-        }, 200 * repeat)
+        }, 1000 )
         return
       }
 
@@ -361,8 +359,8 @@ export class RTC {
     data.user_id    = this.user_id
     // signed message
     if (this._secure) {
-      hash      = this.web3.utils.soliditySha3(JSON.stringify(data))
-      sign_mess = this.web3.eth.accounts.sign(hash, this._secure.privateKey)
+      hash      = web3Utils.soliditySha3(JSON.stringify(data))
+      sign_mess = this.Account.sign(hash, this._secure.privateKey)
     }
     // data.room_id = this.room_id
 
