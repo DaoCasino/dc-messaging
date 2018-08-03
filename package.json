@@ -25,7 +25,8 @@
     "ipfs": "github:DaoCasino/js-ipfs#dc-patch-2",
     "ipfs-pubsub-room": "DaoCasino/ipfs-pubsub-room#dc-patch-1",
     "libp2p": "github:DaoCasino/js-libp2p#dc-patch-2",
-    "web3": "^1.0.0-beta.33"
+    "web3-eth-accounts": "^1.0.0-beta.35",
+    "web3-utils": "^1.0.0-beta.35"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

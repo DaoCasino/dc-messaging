@@ -10,7 +10,8 @@ require('path');
 var EE = _interopDefault(require('event-emitter'));
 var IPFS = _interopDefault(require('ipfs'));
 var Channel = _interopDefault(require('ipfs-pubsub-room'));
-var WEB3 = _interopDefault(require('web3'));
+var web3Acc = _interopDefault(require('web3-eth-accounts'));
+var web3Utils = require('web3-utils');
 
 const debugLog = function (string, loglevel, enable = true) {
   let log = debug('');
@@ -114,14 +115,7 @@ let server = [
 const version = require('./package.json').version;
 
 function upIPFS (yourSwarm) {
-  // if ((!process.env.DC_NETWORK ||
-  //   process.env.DC_NETWORK !== 'local') &&
-  //   typeof yourSwarm !== 'undefined'
-  // ) {
-  //   server.push(yourSwarm.swarm)
-  // } else {
-  //   server = [yourSwarm]
-  // }
+  if (yourSwarm) server.push(yourSwarm);
 
   global.ipfs = new IPFS({
     repo: repo,
@@ -153,7 +147,7 @@ class RTC {
       return
     }
     
-    this.web3 = new WEB3(new WEB3.providers.HttpProvider('https://ropsten.infura.io/JCnK5ifEPH9qcQkX0Ahl'));
+    this.Account = new web3Acc();
 
     if (secure) this._secure = secure;
 
@@ -239,8 +233,8 @@ class RTC {
 
   validSig (sign_mess, data) {
     if (this._secure) {
-      const hash       = this.web3.utils.soliditySha3(JSON.stringify(data));
-      const recover    = this.web3.eth.accounts.recover(hash, sign_mess.signature);
+      const hash       = web3Utils.soliditySha3(JSON.stringify(data));
+      const recover    = this.Account.recover(hash, sign_mess.signature);
       const check_sign = this._secure.allowed_users.some(element => {
         return element.toLowerCase() === recover.toLowerCase()
       });
@@ -402,8 +396,8 @@ class RTC {
     data.user_id    = this.user_id;
     // signed message
     if (this._secure) {
-      hash      = this.web3.utils.soliditySha3(JSON.stringify(data));
-      sign_mess = this.web3.eth.accounts.sign(hash, this._secure.privateKey);
+      hash      = web3Utils.soliditySha3(JSON.stringify(data));
+      sign_mess = this.Account.sign(hash, this._secure.privateKey);
     }
     // data.room_id = this.room_id
 
