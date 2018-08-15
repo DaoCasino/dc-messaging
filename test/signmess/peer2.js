@@ -2,7 +2,6 @@ import random         from 'random-object-generator'
 import web3Acc        from 'web3-eth-accounts'
 import * as messaging from '../../rtc.js'
 
-
 messaging.upIPFS('/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star')
 
 const Acc           = new web3Acc()

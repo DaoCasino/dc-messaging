@@ -115,7 +115,12 @@ let server = [
 const version = require('./package.json').version;
 
 function upIPFS (yourSwarm) {
-  if (yourSwarm) server.push(yourSwarm);
+  if (yourSwarm) {
+    (Array.isArray(yourSwarm))
+      ? server.push(...yourSwarm)
+      : server.push(yourSwarm);
+  }
+
 
   global.ipfs = new IPFS({
     repo: repo,
