@@ -1,6 +1,6 @@
 {
   "name": "dc-messaging",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "IPFS pubsub messaging module",
   "main": "rtc.bundle.js",
   "keywords": [],
