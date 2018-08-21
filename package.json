@@ -9,15 +9,20 @@
   "scripts": {
     "install_signalserver": "npm i -g libp2p-websocket-star-rendezvous",
     "start_signalserver": "rendezvous --port=9090 --host=localhost",
-    "pingpong": "NODE_ENV=test babel-node ./test/pingpong.js",
-    "signmess": "NODE_ENV=test babel-node ./test/signmess/peer1.js & NODE_ENV=test babel-node ./test/signmess/peer2.js",
-    "signmess2": "NODE_ENV=test babel-node ./test/signmess/peer2.js",
+    "test:pingpong": "NODE_ENV=test babel-node ./test/integration/pingpong.js",
+    "test:signmess": "NODE_ENV=test babel-node ./test/integration/signmess/peer1.js & NODE_ENV=test babel-node ./test/signmess/peer2.js",
     "test": "npm run pingpong & npm run pingpong ",
+    "lint": "eslint ./rtc.js",
     "build": "rollup rtc.js --output.format cjs --output.file rtc.bundle.js"
   },
   "devEngines": {
     "node": ">=9.5",
     "npm": ">=5.x"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run lint"
+    }
   },
   "dependencies": {
     "debug": "^3.1.0",
@@ -32,6 +37,14 @@
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "cz-conventional-changelog": "^2.1.0",
+    "eslint": "^4.16.0",
+    "eslint-config-standard": "^11.0.0-beta.0",
+    "eslint-plugin-flowtype": "2.33.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "husky": "^1.0.0-rc.13",
     "random-object-generator": "^1.0.2",
     "rollup": "^0.62.0"
   },
