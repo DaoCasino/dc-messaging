@@ -1,35 +1,30 @@
-export type UserId = string;
+type UserId = string;
 
-export interface RoomInfo {
+interface RoomInfo {
   privateKey: string;
   allowedUsers: UserId[];
 }
-export interface RequestMessage {
+interface RequestMessage {
   from?: string;
   method: string;
   params: any[];
   id: number;
 }
-export interface ResponseMessage {
+interface ResponseMessage {
   from?: string;
   result: any;
   error: any;
   id: number;
 }
 
-export interface SignedResponse<TResponse> {
-  response: TResponse;
-  signature: string;
-}
-
-export interface ISharedRoom {
+interface ISharedRoom {
   onConnect: (dappId: string, callback: (data: any) => void) => void;
   bankrollerActive(params: {
     deposit: number;
     dapp: { slug: string; hash: string };
   });
 }
-export interface IMessagingProvider {
+interface IMessagingProvider {
   getSharedRoom: (
     gameId: string,
     onConnect: (data: any) => void
@@ -40,3 +35,10 @@ export interface IMessagingProvider {
   ) => TRemoteInterface;
   exposeSevice: (address: string, service: any) => void;
 }
+export {
+  IMessagingProvider,
+  ISharedRoom,
+  ResponseMessage,
+  RequestMessage,
+  RoomInfo
+};
