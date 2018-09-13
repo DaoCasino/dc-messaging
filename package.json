@@ -15,7 +15,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "GPL-3",
+  "license": "GPL-3.0",
   "dependencies": {
     "debug": "^3.1.0",
     "ipfs": "0.31.7",
