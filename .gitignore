@@ -9,4 +9,5 @@ yarn-error.log
 .DS_Store
 
 #lock
+package-lock.json
 *.lock
