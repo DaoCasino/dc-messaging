@@ -34,13 +34,16 @@ const debugLog = function (string, loglevel, enable = true) {
 
 const removeRepo = (pathToRepo) => {
   /**
-   * Check NODE_ENV if env = test return this function
+   * Check NODE_ENV if env = test or window === undefined
+   * return this function
    * else delete REPO directory
    */
   if (
     typeof window !== 'undefined' ||
-    process.env.NODE_ENV === 'test'
+    process.env.NODE_ENV === 'test' ||
+    !fs.existsSync(pathToRepo)
   ) {
+    console.log('ENV === test or start with browser or file not exists with path');
     return
   }
   
@@ -78,8 +81,6 @@ const removeRepo = (pathToRepo) => {
     console.error(err);
     process.exit(1);
   }
-
-  return true
 };
 
 const exitListener = () => {
