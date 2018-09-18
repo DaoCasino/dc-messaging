@@ -26,7 +26,12 @@ export const removeRepo = (pathToRepo) => {
    * Check NODE_ENV if env = test return this function
    * else delete REPO directory
    */
-  if (process.env.NODE_ENV === 'test') return
+  if (
+    typeof window !== 'undefined' ||
+    process.env.NODE_ENV === 'test'
+  ) {
+    return
+  }
   
   try {
     /**
