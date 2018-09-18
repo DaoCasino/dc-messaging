@@ -9,8 +9,8 @@
   "scripts": {
     "install_signalserver": "npm i -g libp2p-websocket-star-rendezvous",
     "start_signalserver": "rendezvous --port=9090 --host=localhost",
-    "test:pingpong": "NODE_ENV=test babel-node ./test/integration/pingpong.js",
-    "test:signmess": "NODE_ENV=test babel-node ./test/integration/signmess/peer1.js & NODE_ENV=test babel-node ./test/signmess/peer2.js",
+    "test:pingpong": "NODE_ENV=test babel-node ./test/pingpong.js",
+    "test:signmess": "NODE_ENV=test babel-node ./test/signmess/peer1.js & NODE_ENV=test babel-node ./test/signmess/peer2.js",
     "test": "npm run pingpong & npm run pingpong ",
     "lint": "eslint ./rtc.js",
     "build": "rollup rtc.js --output.format cjs --output.file rtc.bundle.js"
