@@ -118,6 +118,8 @@ export class IpfsTransportProvider implements IMessagingProvider {
         .on("peer joined", id => {
           console.log(`peer joined ${id} to ${this._ipfsNode.id}`);
         });
+      console.log(`Room started ${address}`);
+
       this._roomsMap.set(address, room);
     }
     return room;
@@ -152,7 +154,6 @@ export class IpfsTransportProvider implements IMessagingProvider {
   exposeSevice(address: string, service: any) {
     const ipfsRoom = this._getIpfsRoom(address);
 
-    // todo - that's bullshit
     const wrapper = new ServiceWrapper(service, async response => {
       try {
         const { from } = response;
