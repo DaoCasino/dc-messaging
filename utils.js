@@ -26,7 +26,7 @@ export const removeRepo = (pathToRepo) => {
    * Check NODE_ENV if env = test return this function
    * else delete REPO directory
    */
-  // if (process.env.NODE_ENV === 'test') return
+  if (process.env.NODE_ENV === 'test') return
   
   try {
     /**
@@ -66,8 +66,8 @@ export const exitListener = () => {
   [ 'SIGINT', 'SIGTERM', 'SIGBREAK' ]
     .forEach(SIGNAL => {    
       process.on(SIGNAL, () => {      
-        console.log('sss')
-        removeRepo('./data/messaging')
+        console.log('Process out...')
+        // removeRepo('./data/messaging')
         process.kill(0, 'SIGKILL')
         process.exit()
       })
