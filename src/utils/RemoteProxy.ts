@@ -6,7 +6,10 @@ export const getId = () => {
 };
 
 export class RemoteProxy {
-  _requestCallbacks: Map<number, (data: any) => void>;
+  _requestCallbacks: Map<
+    number,
+    { resolve: (data: any) => void; reject: (error: string) => void }
+  >;
 
   constructor() {
     this._requestCallbacks = new Map();
@@ -28,7 +31,7 @@ export class RemoteProxy {
               const id = getId();
               sendRequest({ method: prop, params, id });
               const promise = new Promise((resolve, reject) => {
-                self._requestCallbacks.set(id, resolve);
+                self._requestCallbacks.set(id, { resolve, reject });
                 setTimeout(
                   () => reject(new Error("Request timed out")),
                   timeout
@@ -50,7 +53,11 @@ export class RemoteProxy {
     const { id } = message;
     const callback = this._requestCallbacks.get(id);
     if (callback) {
-      callback(message);
+      if (message.error) {
+        callback.reject(message.error);
+      } else {
+        callback.resolve(message.result);
+      }
       this._requestCallbacks.delete(id);
     }
   }
