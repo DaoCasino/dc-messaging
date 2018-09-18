@@ -4,6 +4,8 @@
 /node_modules
 /data
 # misc
+package-lock.json
+yarn.lock
 npm-debug.log
 yarn-error.log
 .DS_Store
