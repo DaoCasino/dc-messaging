@@ -1,6 +1,7 @@
 /* global localStorage */
 import EE             from 'event-emitter'
 import IPFS           from 'ipfs'
+import path           from 'path'
 import Channel        from 'ipfs-pubsub-room'
 import web3Acc        from 'web3-eth-accounts'
 import * as Utils     from './utils'
@@ -68,6 +69,7 @@ const seedsDB = (function () {
 
 let ipfs_connected = false
 let repo = Utils.createRepo()
+Utils.exitListener()
 
 let server = [
   '/dns4/signal1.dao.casino/tcp/443/wss/p2p-websocket-star/',
@@ -77,7 +79,9 @@ let server = [
 
 export const version = require('./package.json').version
 
-export function upIPFS (yourSwarm) {
+export async function upIPFS (yourSwarm) {
+  await Utils.removeRepo(path.join(repo, '..'))
+  
   if (yourSwarm) {
     (Array.isArray(yourSwarm))
       ? server.push(...yourSwarm)
