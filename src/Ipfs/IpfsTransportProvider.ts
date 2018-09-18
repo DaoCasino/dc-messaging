@@ -49,31 +49,49 @@ export class IPFSSharedRoom implements ISharedRoom {
   }
   sendResponse: (message: ResponseMessage) => void;
 }
-
+interface IpfsTransportProviderOptions {
+  waitForPeers: boolean;
+}
 export class IpfsTransportProvider implements IMessagingProvider {
   private sharedRoom: IPFSSharedRoom;
   private static _defaultIpfsNode: Ipfs;
   private static _ipfsNodePromise: Promise<Ipfs>;
   private _ipfsNode: Ipfs;
   private _roomsMap: Map<string, any>;
+  private _options: IpfsTransportProviderOptions;
   peerId: string;
-  private constructor(ipfsNode: Ipfs) {
+  private constructor(ipfsNode: Ipfs, options?: IpfsTransportProviderOptions) {
+    this._options = { waitForPeers: true, ...options };
     this._ipfsNode = ipfsNode;
     this.peerId = ipfsNode.id;
     this._roomsMap = new Map();
   }
-  async waitForPeer(peerId: string, address: any, timeout: number = 10000) {
+
+  async stop(address): Promise<boolean> {
+    const room = this._roomsMap.get(address);
+    if (room) {
+      await room.leave();
+      return true;
+    }
+    return false;
+  }
+  async waitForPeer(
+    address: any,
+    peerId?: string,
+    timeout: number = 10000
+  ): Promise<any> {
     return new Promise((resolve, reject) => {
       this._getIpfsRoom(address).once("peer joined", id => {
-        if (peerId === id) {
+        if (!peerId || peerId === id) {
           resolve();
         }
       });
       setTimeout(() => {
-        reject();
+        reject(new Error("Waiting for peer timed out"));
       }, timeout);
     });
   }
+
   static async create(): Promise<IpfsTransportProvider> {
     if (!IpfsTransportProvider._defaultIpfsNode) {
       if (IpfsTransportProvider._ipfsNodePromise) {
@@ -104,6 +122,7 @@ export class IpfsTransportProvider implements IMessagingProvider {
     }
     return room;
   }
+
   getSharedRoom(gameId: string, onConnect: (data: any) => void): ISharedRoom {
     if (this.sharedRoom) return this.sharedRoom;
     const ipfsRoom = this._getIpfsRoom(gameId);
@@ -111,20 +130,23 @@ export class IpfsTransportProvider implements IMessagingProvider {
     return this.sharedRoom;
   }
   getRemoteInterface<TRemoteInterface>(
-    address: string,
-    roomInfo?: RoomInfo
-  ): TRemoteInterface {
+    address: string
+  ): Promise<TRemoteInterface> {
     const ipfsRoom = this._getIpfsRoom(address);
 
     const proxy = new RemoteProxy();
     const self = this;
     ipfsRoom.on("message", message => {
-      if (message.from != self._ipfsNode.id)
+      if (message.from !== self._ipfsNode.id)
         proxy.onRequestResponse(JSON.parse(message.data));
     });
-    return proxy.getProxy(message =>
-      ipfsRoom.broadcast(JSON.stringify(message))
-    );
+    return this.waitForPeer(address).then(() => {
+      const proxyInterface: TRemoteInterface = proxy.getProxy(message => {
+        ipfsRoom.broadcast(JSON.stringify(message));
+      });
+      //const res: any = { v: proxyInterface };
+      return Promise.resolve(proxyInterface as TRemoteInterface);
+    });
   }
 
   exposeSevice(address: string, service: any) {

@@ -22,6 +22,7 @@ export class RemoteProxy {
       {},
       {
         get: (target, prop: string) => {
+          if (prop === "then") return null;
           if (!prop.startsWith("_")) {
             return async (...params): Promise<any> => {
               const id = getId();

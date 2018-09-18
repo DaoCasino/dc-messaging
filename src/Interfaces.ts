@@ -30,9 +30,8 @@ interface IMessagingProvider {
     onConnect: (data: any) => void
   ) => ISharedRoom;
   getRemoteInterface: <TRemoteInterface>(
-    address: string,
-    roomInfo?: RoomInfo
-  ) => TRemoteInterface;
+    address: string
+  ) => Promise<TRemoteInterface>;
   exposeSevice: (address: string, service: any) => void;
 }
 export {

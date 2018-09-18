@@ -39,7 +39,7 @@ class WebsocketTransportProvider {
   getRemoteInterface<TRemoteInterface>(
     address: string,
     roomInfo?: RoomInfo
-  ): TRemoteInterface {
+  ): Promise<TRemoteInterface> {
     const client = new ws.Client(address);
 
     const proxy = new RemoteProxy();
@@ -47,7 +47,9 @@ class WebsocketTransportProvider {
     client.on("message", message => {
       proxy.onRequestResponse(JSON.parse(message));
     });
-    return proxy.getProxy(message => client.send(JSON.stringify(message)));
+    return Promise.resolve(
+      proxy.getProxy(message => client.send(JSON.stringify(message)))
+    );
   }
 
   exposeSevice(address: string, service: any) {
