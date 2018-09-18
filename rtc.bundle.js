@@ -37,33 +37,41 @@ const removeRepo = (pathToRepo) => {
    * Check NODE_ENV if env = test return this function
    * else delete REPO directory
    */
-  // if (process.env.NODE_ENV === 'test') return
+  if (process.env.NODE_ENV === 'test') return
   
   try {
     /**
      * check files in directory
      * and call functions for each of them
      */
-    fs.readdirSync(pathToRepo).forEach(file => {
+    for (let file of fs.readdirSync(pathToRepo)) {
       /**
-       * path to target file
+       * Create path to file inner directory
        */
       const curPath = path.join(pathToRepo, file);
       
       /**
-       * check availability file and
-       * check isDirectory after delete this or recursive call
+       * if file or directory not exist
+       * then missing this path
        */
-      if (typeof curPath !== 'undefined') {
-        (fs.lstatSync(curPath).isDirectory())
-          ? removeRepo(curPath)
-          : fs.unlinkSync(curPath);
-      } 
-    });
+      if (!fs.existsSync(curPath)) { 
+        continue
+      }
 
+      /**
+       * if check path on directory then
+       * recursive call else delete file
+       */
+      (fs.lstatSync(curPath).isDirectory())
+        ? removeRepo(curPath)
+        : fs.unlinkSync(curPath);
+    }
+
+    /** If not files then remove directory */
     fs.rmdirSync(pathToRepo);
   } catch (err) {
     console.error(err);
+    process.exit(1);
   }
 
   return true
@@ -77,8 +85,7 @@ const exitListener = () => {
   [ 'SIGINT', 'SIGTERM', 'SIGBREAK' ]
     .forEach(SIGNAL => {    
       process.on(SIGNAL, () => {      
-        console.log('sss');
-        removeRepo('./data/messaging');
+        console.log('Process out...');
         process.kill(0, 'SIGKILL');
         process.exit();
       });
@@ -165,11 +172,14 @@ let server = [
 const version = require('./package.json').version;
 
 async function upIPFS (yourSwarm) {
+  await removeRepo(path.join(repo, '..'));
+  
   if (yourSwarm) {
     (Array.isArray(yourSwarm))
       ? server.push(...yourSwarm)
       : server.push(yourSwarm);
   }
+
 
   global.ipfs = new IPFS({
     repo: repo,
