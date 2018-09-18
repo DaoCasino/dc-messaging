@@ -1,5 +1,5 @@
-import fs    from 'fs'
 import path  from 'path'
+import fs    from 'fs'
 import debug from 'debug'
 
 export const debugLog = function (string, loglevel, enable = true) {
@@ -21,63 +21,57 @@ export const debugLog = function (string, loglevel, enable = true) {
   return log(string)
 }
 
-export const rmFolder = (pathToDirectory) => {
-  /** 
-   * Check exists file or directory
-   * with param path
+export const removeRepo = (pathToRepo) => {
+  /**
+   * Check NODE_ENV if env = test return this function
+   * else delete REPO directory
    */
-  if (!fs.existsSync(pathToDirectory)) {
-    console.error(`No file or directory with path ${pathToDirectory}`)
-    return
-  }
-
+  // if (process.env.NODE_ENV === 'test') return
+  
   try {
     /**
      * check files in directory
      * and call functions for each of them
      */
-    fs.readdirSync(pathToDirectory).forEach(file => {
-      /** path to target file */
-      const curPath = path.join(pathToDirectory, file)
+    fs.readdirSync(pathToRepo).forEach(file => {
+      /**
+       * path to target file
+       */
+      const curPath = path.join(pathToRepo, file)
+      
       /**
        * check availability file and
        * check isDirectory after delete this or recursive call
        */
-      if (typeof curPath !== 'undefined' && fs.existsSync(curPath)) {
-        (fs.lstatSync(curPath).isDirectory()) 
-          ? rmFolder(curPath) : fs.unlinkSync(curPath)
-      }
+      if (typeof curPath !== 'undefined') {
+        (fs.lstatSync(curPath).isDirectory())
+          ? removeRepo(curPath)
+          : fs.unlinkSync(curPath)
+      } 
     })
 
-    /**
-     * after unlink files with directory
-     * remove target directory
-     */
-    fs.rmdirSync(pathToDirectory)
+    fs.rmdirSync(pathToRepo)
   } catch (err) {
-    process.exit()
+    console.error(err)
   }
+
+  return true
 }
 
-
-export const exitListener = (func, pid) => {
+export const exitListener = () => {
   /**
    * listening for array signalls
    * and call funct wich argument
    */
   [ 'SIGINT', 'SIGTERM', 'SIGBREAK' ]
-  .forEach(SIGNAL => {    
-    process.on(SIGNAL, () => {
-      // Kill all process
-      [pid, process.pid, process.ppid]
-        .forEach(pd => process.kill(pd, 'SIGINT'))
-      
-      // Call function with param
-      func()
-      
-      process.exit()
+    .forEach(SIGNAL => {    
+      process.on(SIGNAL, () => {      
+        console.log('sss')
+        removeRepo('./data/messaging')
+        process.kill(0, 'SIGKILL')
+        process.exit()
+      })
     })
-  })
 }
 
 export const createRepo = (dirpath = './data/messaging/DataBase') => {

@@ -4,8 +4,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var fs = _interopDefault(require('fs'));
 var path = _interopDefault(require('path'));
+var fs = _interopDefault(require('fs'));
 var debug = _interopDefault(require('debug'));
 var EE = _interopDefault(require('event-emitter'));
 var IPFS = _interopDefault(require('ipfs'));
@@ -32,63 +32,57 @@ const debugLog = function (string, loglevel, enable = true) {
   return log(string)
 };
 
-const rmFolder = (pathToDirectory) => {
-  /** 
-   * Check exists file or directory
-   * with param path
+const removeRepo = (pathToRepo) => {
+  /**
+   * Check NODE_ENV if env = test return this function
+   * else delete REPO directory
    */
-  if (!fs.existsSync(pathToDirectory)) {
-    console.error(`No file or directory with path ${pathToDirectory}`);
-    return
-  }
-
+  // if (process.env.NODE_ENV === 'test') return
+  
   try {
     /**
      * check files in directory
      * and call functions for each of them
      */
-    fs.readdirSync(pathToDirectory).forEach(file => {
-      /** path to target file */
-      const curPath = path.join(pathToDirectory, file);
+    fs.readdirSync(pathToRepo).forEach(file => {
+      /**
+       * path to target file
+       */
+      const curPath = path.join(pathToRepo, file);
+      
       /**
        * check availability file and
        * check isDirectory after delete this or recursive call
        */
-      if (typeof curPath !== 'undefined' && fs.existsSync(curPath)) {
-        (fs.lstatSync(curPath).isDirectory()) 
-          ? rmFolder(curPath) : fs.unlinkSync(curPath);
-      }
+      if (typeof curPath !== 'undefined') {
+        (fs.lstatSync(curPath).isDirectory())
+          ? removeRepo(curPath)
+          : fs.unlinkSync(curPath);
+      } 
     });
 
-    /**
-     * after unlink files with directory
-     * remove target directory
-     */
-    fs.rmdirSync(pathToDirectory);
+    fs.rmdirSync(pathToRepo);
   } catch (err) {
-    process.exit();
+    console.error(err);
   }
+
+  return true
 };
 
-
-const exitListener = (func, pid) => {
+const exitListener = () => {
   /**
    * listening for array signalls
    * and call funct wich argument
    */
   [ 'SIGINT', 'SIGTERM', 'SIGBREAK' ]
-  .forEach(SIGNAL => {    
-    process.on(SIGNAL, () => {
-      // Kill all process
-      [pid, process.pid, process.ppid]
-        .forEach(pd => process.kill(pd, 'SIGINT'));
-      
-      // Call function with param
-      func();
-      
-      process.exit();
+    .forEach(SIGNAL => {    
+      process.on(SIGNAL, () => {      
+        console.log('sss');
+        removeRepo('./data/messaging');
+        process.kill(0, 'SIGKILL');
+        process.exit();
+      });
     });
-  });
 };
 
 const createRepo = (dirpath = './data/messaging/DataBase') => {
@@ -160,10 +154,7 @@ const seedsDB = (function () {
 
 let ipfs_connected = false;
 let repo = createRepo();
-
-exitListener(() => {
-  rmFolder(path.join(repo, '../../'));
-}, process.ppid);
+exitListener();
 
 let server = [
   '/dns4/signal1.dao.casino/tcp/443/wss/p2p-websocket-star/',
@@ -173,13 +164,12 @@ let server = [
 
 const version = require('./package.json').version;
 
-function upIPFS (yourSwarm) {
+async function upIPFS (yourSwarm) {
   if (yourSwarm) {
     (Array.isArray(yourSwarm))
       ? server.push(...yourSwarm)
       : server.push(yourSwarm);
   }
-
 
   global.ipfs = new IPFS({
     repo: repo,

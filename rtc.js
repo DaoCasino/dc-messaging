@@ -69,10 +69,7 @@ const seedsDB = (function () {
 
 let ipfs_connected = false
 let repo = Utils.createRepo()
-
-Utils.exitListener(() => {
-  Utils.rmFolder(path.join(repo, '../../'))
-}, process.ppid)
+Utils.exitListener()
 
 let server = [
   '/dns4/signal1.dao.casino/tcp/443/wss/p2p-websocket-star/',
@@ -82,13 +79,12 @@ let server = [
 
 export const version = require('./package.json').version
 
-export function upIPFS (yourSwarm) {
+export async function upIPFS (yourSwarm) {
   if (yourSwarm) {
     (Array.isArray(yourSwarm))
       ? server.push(...yourSwarm)
       : server.push(yourSwarm)
   }
-
 
   global.ipfs = new IPFS({
     repo: repo,
