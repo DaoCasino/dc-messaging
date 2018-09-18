@@ -4,9 +4,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
+var fs = _interopDefault(require('fs'));
+var path = _interopDefault(require('path'));
 var debug = _interopDefault(require('debug'));
-require('fs');
-require('path');
 var EE = _interopDefault(require('event-emitter'));
 var IPFS = _interopDefault(require('ipfs'));
 var Channel = _interopDefault(require('ipfs-pubsub-room'));
@@ -32,13 +32,68 @@ const debugLog = function (string, loglevel, enable = true) {
   return log(string)
 };
 
-const createRepo = (dirpath = './data/messaging/DataBase') => {
-  let pathToRepo = dirpath;
-  if (process.env.NODE_ENV === 'test') {
-    pathToRepo += Math.ceil( Math.random() * 10000);
+const rmFolder = (pathToDirectory) => {
+  /** 
+   * Check exists file or directory
+   * with param path
+   */
+  if (!fs.existsSync(pathToDirectory)) {
+    console.error(`No file or directory with path ${pathToDirectory}`);
+    return
   }
 
-  return pathToRepo
+  try {
+    /**
+     * check files in directory
+     * and call functions for each of them
+     */
+    fs.readdirSync(pathToDirectory).forEach(file => {
+      /** path to target file */
+      const curPath = path.join(pathToDirectory, file);
+      /**
+       * check availability file and
+       * check isDirectory after delete this or recursive call
+       */
+      if (typeof curPath !== 'undefined' && fs.existsSync(curPath)) {
+        (fs.lstatSync(curPath).isDirectory()) 
+          ? rmFolder(curPath) : fs.unlinkSync(curPath);
+      }
+    });
+
+    /**
+     * after unlink files with directory
+     * remove target directory
+     */
+    fs.rmdirSync(pathToDirectory);
+  } catch (err) {
+    process.exit();
+  }
+};
+
+
+const exitListener = (func, pid) => {
+  /**
+   * listening for array signalls
+   * and call funct wich argument
+   */
+  [ 'SIGINT', 'SIGTERM', 'SIGBREAK' ]
+  .forEach(SIGNAL => {    
+    process.on(SIGNAL, () => {
+      // Kill all process
+      [pid, process.pid, process.ppid]
+        .forEach(pd => process.kill(pd, 'SIGINT'));
+      
+      // Call function with param
+      func();
+      
+      process.exit();
+    });
+  });
+};
+
+const createRepo = (dirpath = './data/messaging/DataBase') => {
+  dirpath += Math.ceil( Math.random() * 10000);
+  return path.resolve(dirpath)
 };
 
 /* global localStorage */
@@ -105,6 +160,10 @@ const seedsDB = (function () {
 
 let ipfs_connected = false;
 let repo = createRepo();
+
+exitListener(() => {
+  rmFolder(path.join(repo, '../../'));
+}, process.ppid);
 
 let server = [
   '/dns4/signal1.dao.casino/tcp/443/wss/p2p-websocket-star/',
