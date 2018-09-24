@@ -83,11 +83,10 @@ export async function upIPFS (yourSwarm) {
   await Utils.removeRepo(path.join(repo, '..'))
   
   if (yourSwarm) {
-    (Array.isArray(yourSwarm))
-      ? server.push(...yourSwarm)
-      : server.push(yourSwarm)
+    server = (Array.isArray(yourSwarm))
+      ? yourSwarm
+      : [ yourSwarm ]
   }
-
 
   global.ipfs = new IPFS({
     repo: repo,
@@ -101,6 +100,7 @@ export async function upIPFS (yourSwarm) {
     }
   }).on('ready', () => {
     ipfs_connected = true
+    console.log(global.ipfs.swarm.localAddrs().then(console.log))
   }).on('error', err => {
     console.log(err)
   })
