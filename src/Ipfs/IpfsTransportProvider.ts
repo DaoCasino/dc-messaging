@@ -153,19 +153,22 @@ export class IpfsTransportProvider implements IMessagingProvider {
 
   exposeSevice(address: string, service: any) {
     const ipfsRoom = this._getIpfsRoom(address);
-
+    const self = this;
     const wrapper = new ServiceWrapper(service, async response => {
-      try {
-        const { from } = response;
-        await ipfsRoom.sendTo(from, JSON.stringify(response));
-        console.log("Response sent");
-      } catch (error) {
-        throw error;
-      }
+      const { from } = response;
+      if (from !== self._ipfsNode.id)
+        try {
+          await ipfsRoom.sendTo(from, JSON.stringify(response));
+          console.log("Response sent");
+        } catch (error) {
+          throw error;
+        }
     });
     ipfsRoom.on("message", message => {
       const { from } = message;
-      wrapper.onRequest({ ...JSON.parse(message.data), from });
+      if (from !== self._ipfsNode.id) {
+        wrapper.onRequest({ ...JSON.parse(message.data), from });
+      }
     });
   }
 }
