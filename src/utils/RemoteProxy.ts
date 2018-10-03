@@ -1,4 +1,4 @@
-import { ResponseMessage, RequestMessage } from "../Interfaces";
+import { ResponseMessage, RequestMessage, EventMessage } from "../Interfaces";
 
 let _id = 0;
 export const getId = () => {
@@ -6,6 +6,7 @@ export const getId = () => {
 };
 
 export class RemoteProxy {
+  _subscriptions: Map<string, Set<Function>>;
   _requestCallbacks: Map<
     number,
     { resolve: (data: any) => void; reject: (error: string) => void }
@@ -13,27 +14,29 @@ export class RemoteProxy {
 
   constructor() {
     this._requestCallbacks = new Map();
-    this.onRequestResponse = this.onRequestResponse.bind(this);
+    this.onMessage = this.onMessage.bind(this);
+    this._subscriptions = new Map();
   }
 
   getProxy<TRemoteInterface>(
     sendRequest: (request: RequestMessage) => void,
-    timeout: number = 10000
+    timeout: number = 15000
   ): TRemoteInterface {
-    const self = this;
+    const __self = this;
     const proxy: any = new Proxy(
       {},
       {
         get: (target, prop: string) => {
           if (prop === "then") return null;
+          if (prop === "on") return __self._handleSubscribe.bind(__self);
           if (!prop.startsWith("_")) {
             return async (...params): Promise<any> => {
               const id = getId();
               sendRequest({ method: prop, params, id });
               const promise = new Promise((resolve, reject) => {
-                self._requestCallbacks.set(id, { resolve, reject });
+                __self._requestCallbacks.set(id, { resolve, reject });
                 setTimeout(
-                  () => reject(new Error("Request timed out")),
+                  () => reject(new Error(`Request ${prop} timed out`)),
                   timeout
                 );
               });
@@ -49,14 +52,44 @@ export class RemoteProxy {
     );
     return proxy as TRemoteInterface;
   }
-  onRequestResponse(message: ResponseMessage) {
-    const { id } = message;
+  private _handleSubscribe(...params: any[]) {
+    const [eventName, callback] = params;
+    if (typeof eventName === "string" && typeof callback === "function") {
+      let subscriptions = this._subscriptions.get(eventName);
+      if (!subscriptions) {
+        subscriptions = new Set();
+        this._subscriptions.set(eventName, subscriptions);
+      }
+      subscriptions.add(callback);
+    }
+  }
+  onMessage(message: ResponseMessage | EventMessage) {
+    const eventMessage = message as EventMessage;
+    if (eventMessage.eventName) {
+      this._onEventMessage(eventMessage);
+      return;
+    }
+    const responseMessage = message as ResponseMessage;
+    if (responseMessage.result || responseMessage.error) {
+      this._onRequestResponse(responseMessage);
+    }
+  }
+  _onEventMessage(message: EventMessage) {
+    const { id, eventName, params } = message;
+    const callbacks = this._subscriptions.get(eventName);
+    if (callbacks) {
+      callbacks.forEach(callback => callback(...params));
+    }
+  }
+  _onRequestResponse(message: ResponseMessage) {
+    const { id, result, error } = message;
+
     const callback = this._requestCallbacks.get(id);
     if (callback) {
-      if (message.error) {
-        callback.reject(message.error);
+      if (error) {
+        callback.reject(error);
       } else {
-        callback.resolve(message.result);
+        callback.resolve(result);
       }
       this._requestCallbacks.delete(id);
     }

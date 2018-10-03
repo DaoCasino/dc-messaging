@@ -1,15 +1,8 @@
-import { ISharedRoom, RoomInfo } from "../Interfaces";
+import { RoomInfo } from "../Interfaces";
 import ws from "ws";
 import { RemoteProxy, getId } from "../utils/RemoteProxy";
 import { ServiceWrapper } from "../utils/ServiceWrapper";
 
-class WsSharedRoom {
-  onConnect(dappId: string, callback: (data: any) => void) {}
-  bankrollerActive(params: {
-    deposit: number;
-    dapp: { slug: string; hash: string };
-  }) {}
-}
 class WebsocketTransportProvider {
   private _wsMap: Map<string, any>;
   peerId: string;
@@ -33,9 +26,7 @@ class WebsocketTransportProvider {
     }
     return client;
   }
-  getSharedRoom(gameId: string, onConnect: (data: any) => void): ISharedRoom {
-    return new WsSharedRoom();
-  }
+
   getRemoteInterface<TRemoteInterface>(
     address: string,
     roomInfo?: RoomInfo
@@ -45,26 +36,30 @@ class WebsocketTransportProvider {
     const proxy = new RemoteProxy();
     const self = this;
     client.on("message", message => {
-      proxy.onRequestResponse(JSON.parse(message));
+      proxy.onMessage(JSON.parse(message));
     });
     return Promise.resolve(
       proxy.getProxy(message => client.send(JSON.stringify(message)))
     );
   }
 
-  exposeSevice(address: string, service: any) {
+  exposeSevice(address: string, service: any, isEventEmitter: boolean = false) {
     const server = this._getServer(address);
 
     // todo - that's bullshit
-    const wrapper = new ServiceWrapper(service, async response => {
-      try {
-        const { from } = response;
-        await server.send(from, JSON.stringify(response));
-        console.log("Response sent");
-      } catch (error) {
-        throw error;
-      }
-    });
+    const wrapper = new ServiceWrapper(
+      service,
+      async response => {
+        try {
+          const { from } = response;
+          await server.send(from, JSON.stringify(response));
+          console.log("Response sent");
+        } catch (error) {
+          throw error;
+        }
+      },
+      isEventEmitter
+    );
     server.on("message", message => {
       const { from } = message;
       wrapper.onRequest({ ...JSON.parse(message.data), from });

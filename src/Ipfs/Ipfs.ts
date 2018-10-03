@@ -37,6 +37,7 @@ export function createIpfsNode(yourSwarm = []): Promise<Ipfs> {
       })
       .on("error", error => {
         errors.push(error);
+        reject(error);
       });
   });
 }

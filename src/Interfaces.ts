@@ -10,6 +10,12 @@ interface RequestMessage {
   params: any[];
   id: number;
 }
+interface EventMessage {
+  from?: string;
+  eventName: string;
+  params: any[];
+  id: number;
+}
 interface ResponseMessage {
   from?: string;
   result: any;
@@ -17,27 +23,20 @@ interface ResponseMessage {
   id: number;
 }
 
-interface ISharedRoom {
-  onConnect: (dappId: string, callback: (data: any) => void) => void;
-  bankrollerActive(params: {
-    deposit: number;
-    dapp: { slug: string; hash: string };
-  });
-}
 interface IMessagingProvider {
-  getSharedRoom: (
-    gameId: string,
-    onConnect: (data: any) => void
-  ) => ISharedRoom;
   getRemoteInterface: <TRemoteInterface>(
     address: string
   ) => Promise<TRemoteInterface>;
-  exposeSevice: (address: string, service: any) => void;
+  exposeSevice: (
+    address: string,
+    service: any,
+    isEventEmitter: boolean
+  ) => void;
 }
 export {
   IMessagingProvider,
-  ISharedRoom,
   ResponseMessage,
   RequestMessage,
-  RoomInfo
+  RoomInfo,
+  EventMessage
 };
