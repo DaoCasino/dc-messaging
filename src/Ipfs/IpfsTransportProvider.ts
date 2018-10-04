@@ -129,7 +129,10 @@ export class IpfsTransportProvider implements IMessagingProvider {
     ipfsRoom.on("message", message => {
       const { from } = message;
       if (from !== self._ipfsNode.id) {
-        wrapper.onRequest({ ...JSON.parse(message.data), from });
+        const data = JSON.parse(message.data);
+        if (data.method) {
+          wrapper.onRequest({ ...data, from });
+        }
       }
     });
   }
