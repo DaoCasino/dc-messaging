@@ -1,7 +1,7 @@
-import { RoomInfo } from "../Interfaces";
-import ws from "ws";
-import { RemoteProxy, getId } from "../utils/RemoteProxy";
-import { ServiceWrapper } from "../utils/ServiceWrapper";
+import { RoomInfo } from '../Interfaces';
+import ws from 'ws';
+import { RemoteProxy, getId } from '../utils/RemoteProxy';
+import { ServiceWrapper } from '../utils/ServiceWrapper';
 
 class WebsocketTransportProvider {
   private _wsMap: Map<string, any>;
@@ -35,7 +35,7 @@ class WebsocketTransportProvider {
 
     const proxy = new RemoteProxy();
     const self = this;
-    client.on("message", message => {
+    client.on('message', message => {
       proxy.onMessage(JSON.parse(message));
     });
     return Promise.resolve(
@@ -53,14 +53,14 @@ class WebsocketTransportProvider {
         try {
           const { from } = response;
           await server.send(from, JSON.stringify(response));
-          console.log("Response sent");
+          console.log('Response sent');
         } catch (error) {
           throw error;
         }
       },
       isEventEmitter
     );
-    server.on("message", message => {
+    server.on('message', message => {
       const { from } = message;
       wrapper.onRequest({ ...JSON.parse(message.data), from });
     });
