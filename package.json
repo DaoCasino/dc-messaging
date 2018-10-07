@@ -8,11 +8,6 @@
     "clean": "rimraf lib",
     "typescript": "tsc --build"
   },
-  "husky": {
-    "hooks": {
-      "pre-push": "npm run lint"
-    }
-  },
   "keywords": [],
   "author": "",
   "license": "GPL-3.0",
