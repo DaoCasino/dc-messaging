@@ -1,4 +1,4 @@
-# [DC-Messanging](https://github.com/DaoCasino/dc-messaging)
+# [DC-Messaging](https://github.com/DaoCasino/dc-messaging)
 
 [![JavaScript Style Guide](https://cdn.rawgit.com/standard/standard/master/badge.svg)](https://github.com/standard/standard)
 
@@ -14,7 +14,7 @@ npm install daocasino/dc-messanging
 ```
 ### Usage
 ```js
-  import RTC from 'dc-messanging'
+  import RTC from 'dc-messaging'
   
   const room = new RTC(address, room_name)
   room.sendMsg(msg)
