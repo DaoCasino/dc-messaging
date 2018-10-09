@@ -10,7 +10,7 @@ This project is part of [dc-dev](https://github.com/DaoCasino/dc-dev) and is use
 
 ### Install
 ```shell
-npm install daocasino/dc-messanging
+npm install DaoCasino/dc-messaging --save
 ```
 ### Usage
 ```js
