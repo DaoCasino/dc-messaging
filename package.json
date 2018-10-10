@@ -8,18 +8,17 @@
     "clean": "rimraf lib",
     "typescript": "tsc --build"
   },
-  "husky": {
-    "hooks": {
-      "pre-push": "npm run lint"
-    }
-  },
   "keywords": [],
   "author": "",
   "license": "GPL-3.0",
   "dependencies": {
+    "dc-logging": "^1.0.0",
     "debug": "^3.1.0",
     "ipfs": "0.31.7",
     "ipfs-pubsub-room": "1.4.0",
     "ipfs-repo": "0.23.1"
+  },
+  "devDependencies": {
+    "husky": "1.1.1"
   }
 }

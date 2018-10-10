@@ -1,4 +1,4 @@
-import { ResponseMessage, RequestMessage, EventMessage } from "../Interfaces";
+import { ResponseMessage, RequestMessage, EventMessage } from '../Interfaces';
 
 let _id = 0;
 export const getId = () => {
@@ -27,9 +27,9 @@ export class RemoteProxy {
       {},
       {
         get: (target, prop: string) => {
-          if (prop === "then") return null;
-          if (prop === "on") return __self._handleSubscribe.bind(__self);
-          if (!prop.startsWith("_")) {
+          if (prop === 'then') return null;
+          if (prop === 'on') return __self._handleSubscribe.bind(__self);
+          if (!prop.startsWith('_')) {
             return async (...params): Promise<any> => {
               const id = getId();
               sendRequest({ method: prop, params, id });
@@ -44,7 +44,7 @@ export class RemoteProxy {
             };
           } else {
             return params => {
-              throw new Error("Cannot call private function");
+              throw new Error('Cannot call private function');
             };
           }
         }
@@ -54,7 +54,7 @@ export class RemoteProxy {
   }
   private _handleSubscribe(...params: any[]) {
     const [eventName, callback] = params;
-    if (typeof eventName === "string" && typeof callback === "function") {
+    if (typeof eventName === 'string' && typeof callback === 'function') {
       let subscriptions = this._subscriptions.get(eventName);
       if (!subscriptions) {
         subscriptions = new Set();
