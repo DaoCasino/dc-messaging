@@ -8,6 +8,13 @@
     "clean": "rimraf lib",
     "typescript": "tsc --build"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lerna run format",
+      "pre-push": "lerna run build",
+      "commit-msg": "echo $HUSKY_GIT_PARAMS"
+    }
+  },
   "keywords": [],
   "author": "",
   "license": "GPL-3.0",
