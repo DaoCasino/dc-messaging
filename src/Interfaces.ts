@@ -16,6 +16,7 @@ interface EventMessage {
   params: any[];
   id: number;
 }
+
 interface ResponseMessage {
   from?: string;
   result: any;
