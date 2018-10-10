@@ -1,4 +1,4 @@
-import { IMessagingProvider } from "dc-messaging/src/Interfaces";
+import { IMessagingProvider } from '../Interfaces';
 
 export class DirectTransportProvider implements IMessagingProvider {
   private _services: Map<string, any>;

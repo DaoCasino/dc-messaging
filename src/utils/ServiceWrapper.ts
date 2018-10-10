@@ -1,5 +1,5 @@
-import { ResponseMessage, RequestMessage, EventMessage } from "../Interfaces";
-import { Logger } from "dc-logging";
+import { ResponseMessage, RequestMessage, EventMessage } from '../Interfaces';
+import { Logger } from 'dc-logging';
 
 let _id = 0;
 export const getId = () => {
@@ -24,17 +24,17 @@ export class ServiceWrapper<TService> {
       this.wrapEventEmitter();
     }
     const loggerName =
-      (service.constructor && service.constructor.name) || "ServiceWrapper";
+      (service.constructor && service.constructor.name) || 'ServiceWrapper';
     this.logger = new Logger(loggerName);
   }
   wrapEventEmitter() {
-    const onFunc = this._service["on"];
-    const eventNamesFunc = this._service["eventNames"];
+    const onFunc = this._service['on'];
+    const eventNamesFunc = this._service['eventNames'];
     if (
       onFunc &&
       eventNamesFunc &&
-      typeof onFunc === "function" &&
-      typeof eventNamesFunc === "function"
+      typeof onFunc === 'function' &&
+      typeof eventNamesFunc === 'function'
     ) {
       const eventNames = eventNamesFunc.call(this._service);
       eventNames.forEach(eventName => {
@@ -60,16 +60,16 @@ export class ServiceWrapper<TService> {
       error: null,
       result: null
     };
-    if (method.substring(0, 1) === "_") {
+    if (method.substring(0, 1) === '_') {
       response.error = {
-        status: "ERROR",
-        message: "Cannot call private function"
+        status: 'ERROR',
+        message: 'Cannot call private function'
       };
     }
 
-    if (typeof func !== "function") {
+    if (typeof func !== 'function') {
       response.error = {
-        status: "ERROR",
+        status: 'ERROR',
         mesage: `No function ${method} in ${this._service.constructor.name}`
       };
     }
@@ -77,7 +77,7 @@ export class ServiceWrapper<TService> {
       try {
         response.result = await func.call(this._service, ...params);
       } catch (error) {
-        response.error = { status: "ERROR", message: error.message };
+        response.error = { status: 'ERROR', message: error.message };
       }
     }
     if (response.error) {
