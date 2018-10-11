@@ -28,8 +28,8 @@ export class ServiceWrapper<TService> {
     this.logger = new Logger(loggerName);
   }
   wrapEventEmitter() {
-    const onFunc = this._service['on'];
-    const eventNamesFunc = this._service['eventNames'];
+    const onFunc = (this._service as any).on;
+    const eventNamesFunc = (this._service as any).eventNames;
     if (
       onFunc &&
       eventNamesFunc &&
@@ -53,7 +53,6 @@ export class ServiceWrapper<TService> {
     const { method, params, id, from } = message;
 
     const func = this._service[method];
-    let data;
     const response: ResponseMessage = {
       from,
       id,
