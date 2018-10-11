@@ -6,7 +6,7 @@ export const getId = () => {
 };
 
 export class RemoteProxy {
-  _subscriptions: Map<string, Set<Function>>;
+  _subscriptions: Map<string, Set<any>>;
   _requestCallbacks: Map<
     number,
     { resolve: (data: any) => void; reject: (error: string) => void }
@@ -22,19 +22,19 @@ export class RemoteProxy {
     sendRequest: (request: RequestMessage) => void,
     timeout: number = 15000
   ): TRemoteInterface {
-    const __self = this;
+    const _self = this;
     const proxy: any = new Proxy(
       {},
       {
         get: (target, prop: string) => {
           if (prop === 'then') return null;
-          if (prop === 'on') return __self._handleSubscribe.bind(__self);
+          if (prop === 'on') return _self._handleSubscribe.bind(_self);
           if (!prop.startsWith('_')) {
             return async (...params): Promise<any> => {
               const id = getId();
               sendRequest({ method: prop, params, id });
               const promise = new Promise((resolve, reject) => {
-                __self._requestCallbacks.set(id, { resolve, reject });
+                _self._requestCallbacks.set(id, { resolve, reject });
                 setTimeout(
                   () => reject(new Error(`Request ${prop} timed out`)),
                   timeout

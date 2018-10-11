@@ -1,7 +1,7 @@
 import Ipfs from 'ipfs';
 import { getRepoPath } from './Utils';
 
-let Swarm = [
+const Swarm = [
   '/dns4/signal2.dao.casino/tcp/443/wss/p2p-websocket-star/',
   '/dns4/signal1.dao.casino/tcp/443/wss/p2p-websocket-star/',
 

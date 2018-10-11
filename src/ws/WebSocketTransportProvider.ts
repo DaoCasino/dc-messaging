@@ -3,7 +3,7 @@ import ws from 'ws';
 import { RemoteProxy, getId } from '../utils/RemoteProxy';
 import { ServiceWrapper } from '../utils/ServiceWrapper';
 
-class WebsocketTransportProvider {
+export class WebsocketTransportProvider {
   private _wsMap: Map<string, any>;
   peerId: string;
   private _wsStartPromise;
@@ -53,7 +53,6 @@ class WebsocketTransportProvider {
         try {
           const { from } = response;
           await server.send(from, JSON.stringify(response));
-          console.log('Response sent');
         } catch (error) {
           throw error;
         }
