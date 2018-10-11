@@ -28,8 +28,8 @@ export class ServiceWrapper<TService> {
     this.logger = new Logger(loggerName);
   }
   wrapEventEmitter() {
-    const onFunc = this._service['on'];
-    const eventNamesFunc = this._service['eventNames'];
+    const onFunc = (this._service as any).on;
+    const eventNamesFunc = (this._service as any).eventNames;
     if (
       onFunc &&
       eventNamesFunc &&
@@ -53,13 +53,18 @@ export class ServiceWrapper<TService> {
     const { method, params, id, from } = message;
 
     const func = this._service[method];
-    let data;
     const response: ResponseMessage = {
       from,
       id,
       error: null,
       result: null
     };
+    if (!method) {
+      response.error = {
+        status: 'ERROR',
+        message: 'Method not specified'
+      };
+    }
     if (method.substring(0, 1) === '_') {
       response.error = {
         status: 'ERROR',
@@ -75,14 +80,17 @@ export class ServiceWrapper<TService> {
     }
     if (!response.error) {
       try {
+        // this.logger.debug(`call method ${method}`);
         response.result = await func.call(this._service, ...params);
       } catch (error) {
         response.error = { status: 'ERROR', message: error.message };
+        // (response as any).stackTrace = error;
       }
     }
     if (response.error) {
       this.logger.error(response.error);
     }
+    // this.logger.debug(`response ${method}: ${JSON.stringify(response)}`);
     this.sendResponse(response);
   }
 }

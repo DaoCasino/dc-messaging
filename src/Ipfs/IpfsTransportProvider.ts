@@ -10,10 +10,12 @@ import {
 import { RemoteProxy, getId } from '../utils/RemoteProxy';
 import { createIpfsNode } from './Ipfs';
 import { ServiceWrapper } from '../utils/ServiceWrapper';
+import { Logger } from 'dc-logging';
 
 interface IpfsTransportProviderOptions {
   waitForPeers: boolean;
 }
+const logger = new Logger('IpfsTransportProvider');
 export class IpfsTransportProvider implements IMessagingProvider {
   private static _defaultIpfsNode: Ipfs;
   private static _ipfsNodePromise: Promise<Ipfs>;
@@ -74,15 +76,15 @@ export class IpfsTransportProvider implements IMessagingProvider {
     if (!room) {
       room = IpfsRoom(this._ipfsNode, address, {})
         .on('error', error => {
-          console.error(error);
+          logger.error(error);
         })
         .on('peer joined', id => {
           const roomName = `${name || ''} ${address}`;
-          console.log(
+          logger.debug(
             `Peer joined ${id} to ${this._ipfsNode.id} in room ${roomName}`
           );
         });
-      console.log(`Room started ${address}`);
+      logger.debug(`Room started ${address}`);
 
       this._roomsMap.set(address, room);
     }
@@ -101,14 +103,15 @@ export class IpfsTransportProvider implements IMessagingProvider {
     const proxy = new RemoteProxy();
     const self = this;
     ipfsRoom.on('message', message => {
-      if (message.from !== self._ipfsNode.id)
+      if (message.from !== self._ipfsNode.id) {
         proxy.onMessage(JSON.parse(message.data));
+      }
     });
     return this.waitForPeer(address).then(() => {
       const proxyInterface: TRemoteInterface = proxy.getProxy(message => {
         ipfsRoom.broadcast(JSON.stringify(message));
       });
-      //const res: any = { v: proxyInterface };
+      // const res: any = { v: proxyInterface };
       return Promise.resolve(proxyInterface as TRemoteInterface);
     });
   }
@@ -127,12 +130,13 @@ export class IpfsTransportProvider implements IMessagingProvider {
         if (eventName) {
           await ipfsRoom.broadcast(JSON.stringify(response));
         } else {
-          if (from !== self._ipfsNode.id)
+          if (from !== self._ipfsNode.id) {
             try {
               await ipfsRoom.sendTo(from, JSON.stringify(response));
             } catch (error) {
               throw error;
             }
+          }
         }
       },
       isEventEmitter
