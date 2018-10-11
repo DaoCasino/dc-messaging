@@ -3,6 +3,6 @@ export const getRepoPath = () => {
     '/tmp/ipfs-test-' +
     Math.random()
       .toString()
-      .substring(2, 8);
-  return repoPath;
-};
+      .substring(2, 8)
+  return repoPath
+}

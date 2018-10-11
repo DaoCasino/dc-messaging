@@ -1,42 +1,42 @@
-import Ipfs from 'ipfs';
-import IpfsRoom from 'ipfs-pubsub-room';
+import Ipfs from 'ipfs'
+import IpfsRoom from 'ipfs-pubsub-room'
 import {
   IMessagingProvider,
   RoomInfo,
   RequestMessage,
   ResponseMessage,
-  EventMessage
-} from '../Interfaces';
-import { RemoteProxy, getId } from '../utils/RemoteProxy';
-import { createIpfsNode } from './Ipfs';
-import { ServiceWrapper } from '../utils/ServiceWrapper';
-import { Logger } from 'dc-logging';
+  EventMessage,
+} from '../Interfaces'
+import { RemoteProxy, getId } from '../utils/RemoteProxy'
+import { createIpfsNode } from './Ipfs'
+import { ServiceWrapper } from '../utils/ServiceWrapper'
+import { Logger } from 'dc-logging'
 
 interface IpfsTransportProviderOptions {
-  waitForPeers: boolean;
+  waitForPeers: boolean
 }
-const logger = new Logger('IpfsTransportProvider');
+const logger = new Logger('IpfsTransportProvider')
 export class IpfsTransportProvider implements IMessagingProvider {
-  private static _defaultIpfsNode: Ipfs;
-  private static _ipfsNodePromise: Promise<Ipfs>;
-  private _ipfsNode: Ipfs;
-  private _roomsMap: Map<string, any>;
-  private _options: IpfsTransportProviderOptions;
-  peerId: string;
+  private static _defaultIpfsNode: Ipfs
+  private static _ipfsNodePromise: Promise<Ipfs>
+  private _ipfsNode: Ipfs
+  private _roomsMap: Map<string, any>
+  private _options: IpfsTransportProviderOptions
+  peerId: string
   private constructor(ipfsNode: Ipfs, options?: IpfsTransportProviderOptions) {
-    this._options = { waitForPeers: true, ...options };
-    this._ipfsNode = ipfsNode;
-    this.peerId = ipfsNode.id;
-    this._roomsMap = new Map();
+    this._options = { waitForPeers: true, ...options }
+    this._ipfsNode = ipfsNode
+    this.peerId = ipfsNode.id
+    this._roomsMap = new Map()
   }
 
   async stop(address): Promise<boolean> {
-    const room = this._roomsMap.get(address);
+    const room = this._roomsMap.get(address)
     if (room) {
-      await room.leave();
-      return true;
+      await room.leave()
+      return true
     }
-    return false;
+    return false
   }
   async waitForPeer(
     address: any,
@@ -46,49 +46,49 @@ export class IpfsTransportProvider implements IMessagingProvider {
     return new Promise((resolve, reject) => {
       this._getIpfsRoom(address).once('peer joined', id => {
         if (!peerId || peerId === id) {
-          resolve();
+          resolve()
         }
-      });
+      })
       setTimeout(() => {
-        reject(new Error('Waiting for peer timed out'));
-      }, timeout);
-    });
+        reject(new Error('Waiting for peer timed out'))
+      }, timeout)
+    })
   }
 
   static async create(): Promise<IpfsTransportProvider> {
     if (!IpfsTransportProvider._defaultIpfsNode) {
       if (IpfsTransportProvider._ipfsNodePromise) {
-        IpfsTransportProvider._defaultIpfsNode = await IpfsTransportProvider._ipfsNodePromise;
+        IpfsTransportProvider._defaultIpfsNode = await IpfsTransportProvider._ipfsNodePromise
       } else {
-        IpfsTransportProvider._ipfsNodePromise = createIpfsNode();
-        IpfsTransportProvider._defaultIpfsNode = await IpfsTransportProvider._ipfsNodePromise;
-        IpfsTransportProvider._ipfsNodePromise = null;
+        IpfsTransportProvider._ipfsNodePromise = createIpfsNode()
+        IpfsTransportProvider._defaultIpfsNode = await IpfsTransportProvider._ipfsNodePromise
+        IpfsTransportProvider._ipfsNodePromise = null
       }
     }
-    return new IpfsTransportProvider(IpfsTransportProvider._defaultIpfsNode);
+    return new IpfsTransportProvider(IpfsTransportProvider._defaultIpfsNode)
   }
   static async createAdditional(): Promise<IpfsTransportProvider> {
-    const ipfsNode = await createIpfsNode();
-    return new IpfsTransportProvider(ipfsNode);
+    const ipfsNode = await createIpfsNode()
+    return new IpfsTransportProvider(ipfsNode)
   }
   private _getIpfsRoom(address: string, name?: string): any {
-    let room = this._roomsMap.get(address);
+    let room = this._roomsMap.get(address)
     if (!room) {
       room = IpfsRoom(this._ipfsNode, address, {})
         .on('error', error => {
-          logger.error(error);
+          logger.error(error)
         })
         .on('peer joined', id => {
-          const roomName = `${name || ''} ${address}`;
+          const roomName = `${name || ''} ${address}`
           logger.debug(
             `Peer joined ${id} to ${this._ipfsNode.id} in room ${roomName}`
-          );
-        });
-      logger.debug(`Room started ${address}`);
+          )
+        })
+      logger.debug(`Room started ${address}`)
 
-      this._roomsMap.set(address, room);
+      this._roomsMap.set(address, room)
     }
-    return room;
+    return room
   }
 
   getRemoteInterface<TRemoteInterface>(
@@ -98,22 +98,22 @@ export class IpfsTransportProvider implements IMessagingProvider {
     const ipfsRoom = this._getIpfsRoom(
       address,
       `Remote interface ${roomName || ''}`
-    );
+    )
 
-    const proxy = new RemoteProxy();
-    const self = this;
+    const proxy = new RemoteProxy()
+    const self = this
     ipfsRoom.on('message', message => {
       if (message.from !== self._ipfsNode.id) {
-        proxy.onMessage(JSON.parse(message.data));
+        proxy.onMessage(JSON.parse(message.data))
       }
-    });
+    })
     return this.waitForPeer(address).then(() => {
       const proxyInterface: TRemoteInterface = proxy.getProxy(message => {
-        ipfsRoom.broadcast(JSON.stringify(message));
-      });
-      // const res: any = { v: proxyInterface };
-      return Promise.resolve(proxyInterface as TRemoteInterface);
-    });
+        ipfsRoom.broadcast(JSON.stringify(message))
+      })
+      // const res: any = { v: proxyInterface }
+      return Promise.resolve(proxyInterface as TRemoteInterface)
+    })
   }
 
   exposeSevice(address: string, service: any, isEventEmitter: boolean = false) {
@@ -121,34 +121,34 @@ export class IpfsTransportProvider implements IMessagingProvider {
       address,
       `Expose service ${(service.constructor && service.constructor.name) ||
         ''}`
-    );
-    const self = this;
+    )
+    const self = this
     const wrapper = new ServiceWrapper(
       service,
       async response => {
-        const { from, eventName } = response as EventMessage;
+        const { from, eventName } = response as EventMessage
         if (eventName) {
-          await ipfsRoom.broadcast(JSON.stringify(response));
+          await ipfsRoom.broadcast(JSON.stringify(response))
         } else {
           if (from !== self._ipfsNode.id) {
             try {
-              await ipfsRoom.sendTo(from, JSON.stringify(response));
+              await ipfsRoom.sendTo(from, JSON.stringify(response))
             } catch (error) {
-              throw error;
+              throw error
             }
           }
         }
       },
       isEventEmitter
-    );
+    )
     ipfsRoom.on('message', message => {
-      const { from } = message;
+      const { from } = message
       if (from !== self._ipfsNode.id) {
-        const data = JSON.parse(message.data);
+        const data = JSON.parse(message.data)
         if (data.method) {
-          wrapper.onRequest({ ...data, from });
+          wrapper.onRequest({ ...data, from })
         }
       }
-    });
+    })
   }
 }
