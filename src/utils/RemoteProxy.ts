@@ -1,4 +1,4 @@
-import { ResponseMessage, RequestMessage, EventMessage } from '../Interfaces'
+import { ResponseMessage, RequestMessage, EventMessage } from "../Interfaces"
 
 let _id = 0
 export const getId = () => {
@@ -27,9 +27,9 @@ export class RemoteProxy {
       {},
       {
         get: (target, prop: string) => {
-          if (prop === 'then') return null
-          if (prop === 'on') return _self._handleSubscribe.bind(_self)
-          if (!prop.startsWith('_')) {
+          if (prop === "then") return null
+          if (prop === "on") return _self._handleSubscribe.bind(_self)
+          if (!prop.startsWith("_")) {
             return async (...params): Promise<any> => {
               const id = getId()
               sendRequest({ method: prop, params, id })
@@ -44,17 +44,17 @@ export class RemoteProxy {
             }
           } else {
             return params => {
-              throw new Error('Cannot call private function')
+              throw new Error("Cannot call private function")
             }
           }
-        },
+        }
       }
     )
     return proxy as TRemoteInterface
   }
   private _handleSubscribe(...params: any[]) {
     const [eventName, callback] = params
-    if (typeof eventName === 'string' && typeof callback === 'function') {
+    if (typeof eventName === "string" && typeof callback === "function") {
       let subscriptions = this._subscriptions.get(eventName)
       if (!subscriptions) {
         subscriptions = new Set()
@@ -86,12 +86,12 @@ export class RemoteProxy {
 
     const callback = this._requestCallbacks.get(id)
     if (callback) {
+      this._requestCallbacks.delete(id)
       if (error) {
         callback.reject(error)
       } else {
         callback.resolve(result)
       }
-      this._requestCallbacks.delete(id)
     }
   }
 }
