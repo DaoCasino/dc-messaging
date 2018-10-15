@@ -1,43 +1,39 @@
-type UserId = string;
+type UserId = string
 
 interface RoomInfo {
-  privateKey: string;
-  allowedUsers: UserId[];
+  privateKey: string
+  allowedUsers: UserId[]
 }
 interface RequestMessage {
-  from?: string;
-  method: string;
-  params: any[];
-  id: number;
+  from?: string
+  method: string
+  params: any[]
+  id: number
 }
 interface EventMessage {
-  from?: string;
-  eventName: string;
-  params: any[];
-  id: number;
+  from?: string
+  eventName: string
+  params: any[]
+  id: number
 }
 
 interface ResponseMessage {
-  from?: string;
-  result: any;
-  error: any;
-  id: number;
+  from?: string
+  result: any
+  error: any
+  id: number
 }
 
 interface IMessagingProvider {
   getRemoteInterface: <TRemoteInterface>(
     address: string
-  ) => Promise<TRemoteInterface>;
-  exposeSevice: (
-    address: string,
-    service: any,
-    isEventEmitter: boolean
-  ) => void;
+  ) => Promise<TRemoteInterface>
+  exposeSevice: (address: string, service: any, isEventEmitter: boolean) => void
 }
 export {
   IMessagingProvider,
   ResponseMessage,
   RequestMessage,
   RoomInfo,
-  EventMessage
-};
+  EventMessage,
+}
