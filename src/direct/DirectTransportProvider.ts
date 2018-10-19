@@ -1,4 +1,4 @@
-import { IMessagingProvider } from '../Interfaces'
+import { IMessagingProvider } from "../Interfaces"
 
 export class DirectTransportProvider implements IMessagingProvider {
   private _services: Map<string, any>
@@ -9,6 +9,7 @@ export class DirectTransportProvider implements IMessagingProvider {
     address: string
   ): Promise<TRemoteInterface> {
     const service = this._services.get(address)
+    if (!service) throw new Error(`No service registered at address ${address}`)
     return Promise.resolve(service as TRemoteInterface)
   }
   exposeSevice(address: string, service: any, isEventEmitter: boolean = true) {
