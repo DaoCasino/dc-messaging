@@ -4,8 +4,8 @@
   "description": "Messaging transport providers",
   "main": "./lib/index",
   "scripts": {
-    "build": "npm-run-all typescript",
     "build:ts": "yarn typescript",
+    "build": "yarn typescript",
     "clean": "rimraf lib",
     "typescript": "tsc --build"
   },
@@ -14,7 +14,6 @@
   "license": "GPL-3.0",
   "dependencies": {
     "dc-logging": "^1.0.0",
-    "debug": "^3.1.0",
     "ipfs": "0.31.7",
     "ipfs-pubsub-room": "1.4.0",
     "ipfs-repo": "0.23.1",
