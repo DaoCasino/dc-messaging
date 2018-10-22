@@ -13,7 +13,7 @@ interface RequestMessage {
 interface EventMessage {
   from?: string
   eventName: string
-  params: any[]
+  params: any
   id: number
 }
 

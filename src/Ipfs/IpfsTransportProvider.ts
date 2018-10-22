@@ -91,6 +91,28 @@ export class IpfsTransportProvider implements IMessagingProvider {
     return room
   }
 
+  emitRemote(address: string, peerId: string, eventName: string, params: any) {
+    const room = this._roomsMap.get(address)
+    if(!room) {
+      throw new Error(`No open room at ${address}`)
+    }
+
+    const eventMessage: EventMessage = {
+      id: Date.now(),
+      eventName,
+      params,
+      from: this.peerId
+    }
+
+    // logger.debug(eventMessage)
+
+    room.sendTo(peerId, JSON.stringify(eventMessage))
+  }
+
+  getPeerId() {
+    return this.peerId
+  }
+
   getRemoteInterface<TRemoteInterface>(
     address: string,
     roomName?: string
