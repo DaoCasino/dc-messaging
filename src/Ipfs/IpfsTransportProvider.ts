@@ -1,21 +1,21 @@
-import Ipfs from 'ipfs'
-import IpfsRoom from 'ipfs-pubsub-room'
+import Ipfs from "ipfs"
+import IpfsRoom from "ipfs-pubsub-room"
 import {
   IMessagingProvider,
   RoomInfo,
   RequestMessage,
   ResponseMessage,
-  EventMessage,
-} from '../Interfaces'
-import { RemoteProxy, getId } from '../utils/RemoteProxy'
-import { createIpfsNode } from './Ipfs'
-import { ServiceWrapper } from '../utils/ServiceWrapper'
-import { Logger } from 'dc-logging'
+  EventMessage
+} from "../Interfaces"
+import { RemoteProxy, getId } from "../utils/RemoteProxy"
+import { createIpfsNode } from "./Ipfs"
+import { ServiceWrapper } from "../utils/ServiceWrapper"
+import { Logger } from "dc-logging"
 
 interface IpfsTransportProviderOptions {
   waitForPeers: boolean
 }
-const logger = new Logger('IpfsTransportProvider')
+const logger = new Logger("IpfsTransportProvider")
 export class IpfsTransportProvider implements IMessagingProvider {
   private static _defaultIpfsNode: Ipfs
   private static _ipfsNodePromise: Promise<Ipfs>
@@ -44,13 +44,13 @@ export class IpfsTransportProvider implements IMessagingProvider {
     timeout: number = 10000
   ): Promise<any> {
     return new Promise((resolve, reject) => {
-      this._getIpfsRoom(address).once('peer joined', id => {
+      this._getIpfsRoom(address).once("peer joined", id => {
         if (!peerId || peerId === id) {
           resolve()
         }
       })
       setTimeout(() => {
-        reject(new Error('Waiting for peer timed out'))
+        reject(new Error("Waiting for peer timed out"))
       }, timeout)
     })
   }
@@ -75,11 +75,11 @@ export class IpfsTransportProvider implements IMessagingProvider {
     let room = this._roomsMap.get(address)
     if (!room) {
       room = IpfsRoom(this._ipfsNode, address, {})
-        .on('error', error => {
+        .on("error", error => {
           logger.error(error)
         })
-        .on('peer joined', id => {
-          const roomName = `${name || ''} ${address}`
+        .on("peer joined", id => {
+          const roomName = `${name || ""} ${address}`
           logger.debug(
             `Peer joined ${id} to ${this._ipfsNode.id} in room ${roomName}`
           )
@@ -97,12 +97,12 @@ export class IpfsTransportProvider implements IMessagingProvider {
   ): Promise<TRemoteInterface> {
     const ipfsRoom = this._getIpfsRoom(
       address,
-      `Remote interface ${roomName || ''}`
+      `Remote interface ${roomName || ""}`
     )
 
     const proxy = new RemoteProxy()
     const self = this
-    ipfsRoom.on('message', message => {
+    ipfsRoom.on("message", message => {
       if (message.from !== self._ipfsNode.id) {
         proxy.onMessage(JSON.parse(message.data))
       }
@@ -120,8 +120,9 @@ export class IpfsTransportProvider implements IMessagingProvider {
     const ipfsRoom = this._getIpfsRoom(
       address,
       `Expose service ${(service.constructor && service.constructor.name) ||
-        ''}`
+        ""}`
     )
+
     const self = this
     const wrapper = new ServiceWrapper(
       service,
@@ -141,7 +142,15 @@ export class IpfsTransportProvider implements IMessagingProvider {
       },
       isEventEmitter
     )
-    ipfsRoom.on('message', message => {
+    if (wrapper.serviceIsEventEmitter) {
+      ipfsRoom.on("peer joined", id => {
+        service.emit("connected", { id, address })
+      })
+      ipfsRoom.on("peer left", id => {
+        service.emit("disconnected", { id, address })
+      })
+    }
+    ipfsRoom.on("message", message => {
       const { from } = message
       if (from !== self._ipfsNode.id) {
         const data = JSON.parse(message.data)
