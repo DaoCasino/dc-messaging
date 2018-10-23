@@ -15,4 +15,11 @@ export class DirectTransportProvider implements IMessagingProvider {
   exposeSevice(address: string, service: any, isEventEmitter: boolean = true) {
     this._services.set(address, service)
   }
+
+  stopService(address: string): Promise<boolean> {
+    return new Promise(function(resolve, reject) {
+      const status = this._services.delete(address)
+      resolve(status)
+    })
+  }
 }
