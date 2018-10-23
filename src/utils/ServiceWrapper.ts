@@ -81,7 +81,7 @@ export class ServiceWrapper<TService> {
     if (typeof func !== "function") {
       response.error = {
         status: "ERROR",
-        mesage: `No function ${method} in ${this._service.constructor.name}`
+        message: `No function ${method} in ${this._service.constructor.name}`
       }
     }
     if (!response.error) {
