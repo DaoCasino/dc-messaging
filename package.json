@@ -1,6 +1,6 @@
 {
   "name": "dc-messaging",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Messaging transport providers",
   "main": "./lib/index",
   "scripts": {
@@ -14,15 +14,16 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@types/node": "^10.11.7",
-    "dc-logging": "^0.2.0",
+    "dc-logging": "^0.3.0",
     "ipfs": "0.31.7",
     "ipfs-pubsub-room": "1.4.0",
     "ipfs-repo": "0.23.1",
     "ws": "^6.1.0"
   },
   "devDependencies": {
+    "husky": "1.1.1",
     "tslint": "5.11.0",
-    "typescript": "^3.1.2",
-    "husky": "1.1.1"
-  }
+    "typescript": "^3.1.2"
+  },
+  "gitHead": "865d20c921eb00208778bbdcbb47fe95c2b4ed38"
 }
