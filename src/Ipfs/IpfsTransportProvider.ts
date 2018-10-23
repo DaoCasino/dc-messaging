@@ -98,13 +98,12 @@ export class IpfsTransportProvider implements IMessagingProvider {
     }
 
     const eventMessage: EventMessage = {
-      id: Date.now(),
+      id: getId(),
       eventName,
-      params,
+      params: [params], // TODO: ???
       from: this.peerId
     }
 
-    // logger.debug(eventMessage)
     try {
       await room.sendTo(peerId, JSON.stringify(eventMessage))
     } catch (error) {
