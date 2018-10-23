@@ -91,7 +91,7 @@ export class IpfsTransportProvider implements IMessagingProvider {
     return room
   }
 
-  emitRemote(address: string, peerId: string, eventName: string, params: any) {
+  async emitRemote(address: string, peerId: string, eventName: string, params: any) {
     const room = this._roomsMap.get(address)
     if(!room) {
       throw new Error(`No open room at ${address}`)
@@ -105,8 +105,11 @@ export class IpfsTransportProvider implements IMessagingProvider {
     }
 
     // logger.debug(eventMessage)
-
-    room.sendTo(peerId, JSON.stringify(eventMessage))
+    try {
+      await room.sendTo(peerId, JSON.stringify(eventMessage))
+    } catch (error) {
+      throw error
+    }
   }
 
   getPeerId() {
@@ -181,5 +184,18 @@ export class IpfsTransportProvider implements IMessagingProvider {
         }
       }
     })
+  }
+
+  async stopService(address: string): Promise<boolean> {
+    const leaveRooms = async (roomsAddress: IterableIterator<string>) => {
+      let status
+      for(const roomAddress of roomsAddress) {
+        status = await this.stop(roomAddress)
+        if(!status) throw new Error(`Error leave room: ${roomAddress}`)
+      }
+    }
+    await leaveRooms(this._roomsMap.keys())
+    this._roomsMap.clear()
+    return true
   }
 }
