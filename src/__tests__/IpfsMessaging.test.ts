@@ -71,7 +71,7 @@ const testRawIpfs = async () => {
 }
 const test = async () => {
   const roomProvider1 = await IpfsTransportProvider.create()
-  const roomProvider2 = await IpfsTransportProvider.createAdditional()
+  const roomProvider2 = await IpfsTransportProvider.create()
   // const peerWaitPromise = roomProvider1.waitForPeer(
   //   roomProvider2.peerId,
   //   room12
@@ -87,6 +87,10 @@ const test = async () => {
   logger.debug(res1)
   const res2 = await serv2.method3()
   logger.debug(res2)
+
+  roomProvider2.stopService(room12)
+  roomProvider2.destroy()
+  roomProvider1.destroy()
 }
 
 test()

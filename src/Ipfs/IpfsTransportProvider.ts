@@ -2,28 +2,28 @@ import Ipfs from "ipfs"
 import IpfsRoom from "ipfs-pubsub-room"
 import {
   IMessagingProvider,
-  RoomInfo,
-  RequestMessage,
-  ResponseMessage,
   EventMessage
 } from "../Interfaces"
 import { RemoteProxy, getId } from "../utils/RemoteProxy"
-import { createIpfsNode } from "./Ipfs"
+import { createIpfsNode, destroyIpfsNode } from "./Ipfs"
 import { ServiceWrapper } from "../utils/ServiceWrapper"
 import { Logger } from "dc-logging"
+
+
+const DEFAULT_PEER_TIMEOUT = 10000
 
 interface IpfsTransportProviderOptions {
   waitForPeers: boolean
 }
 const logger = new Logger("IpfsTransportProvider")
 export class IpfsTransportProvider implements IMessagingProvider {
-  private static _defaultIpfsNode: Ipfs
-  private static _ipfsNodePromise: Promise<Ipfs>
+  // private static _defaultIpfsNode: Ipfs
+  // private static _ipfsNodePromise: Promise<Ipfs>
   private _ipfsNode: Ipfs
   private _roomsMap: Map<string, any>
   private _options: IpfsTransportProviderOptions
   peerId: string
-  static _ipfsNodes: Ipfs[] = []
+  // static _ipfsNodes: Ipfs[] = []
   private constructor(ipfsNode: Ipfs, options?: IpfsTransportProviderOptions) {
     this._options = { waitForPeers: true, ...options }
     this._ipfsNode = ipfsNode
@@ -31,27 +31,27 @@ export class IpfsTransportProvider implements IMessagingProvider {
     this._roomsMap = new Map()
   }
 
-  async stop(address): Promise<boolean> {
+  private async _leaveRoom(address): Promise<boolean> {
     const room = this._roomsMap.get(address)
     if (room) {
       await room.leave()
+      this._roomsMap.delete(address)
       return true
     }
     return false
   }
-  static stop() {
-    return Promise.all(
-      IpfsTransportProvider._ipfsNodes.map(node => node.stop())
-    )
-  }
-  stopIpfsNode(): Promise<void> {
-    return this._ipfsNode.stop()
+
+  private async _leaveRooms() {
+    for (const room of this._roomsMap.values()) {
+      await room.leave()
+    }
+    this._roomsMap.clear()
   }
 
   async waitForPeer(
     address: any,
     peerId?: string,
-    timeout: number = 10000
+    timeout: number = DEFAULT_PEER_TIMEOUT
   ): Promise<any> {
     return new Promise((resolve, reject) => {
       this._getIpfsRoom(address).once("peer joined", id => {
@@ -64,28 +64,18 @@ export class IpfsTransportProvider implements IMessagingProvider {
       }, timeout)
     })
   }
-  static _createIpfsNode(): Promise<Ipfs> {
-    return createIpfsNode().then(node => {
-      IpfsTransportProvider._ipfsNodes.push(node)
-      return node
-    })
-  }
+
   static async create(): Promise<IpfsTransportProvider> {
-    if (!IpfsTransportProvider._defaultIpfsNode) {
-      if (IpfsTransportProvider._ipfsNodePromise) {
-        IpfsTransportProvider._defaultIpfsNode = await IpfsTransportProvider._ipfsNodePromise
-      } else {
-        IpfsTransportProvider._ipfsNodePromise = IpfsTransportProvider._createIpfsNode()
-        IpfsTransportProvider._defaultIpfsNode = await IpfsTransportProvider._ipfsNodePromise
-        IpfsTransportProvider._ipfsNodePromise = null
-      }
-    }
-    return new IpfsTransportProvider(IpfsTransportProvider._defaultIpfsNode)
-  }
-  static async createAdditional(): Promise<IpfsTransportProvider> {
-    const ipfsNode = await IpfsTransportProvider._createIpfsNode()
+    const ipfsNode = await createIpfsNode()
     return new IpfsTransportProvider(ipfsNode)
   }
+
+  async destroy() {
+    await this._leaveRooms()
+    await destroyIpfsNode(this._ipfsNode)
+    this._ipfsNode = null
+  }
+
   private _getIpfsRoom(address: string, name?: string): any {
     let room = this._roomsMap.get(address)
     if (!room) {
@@ -206,15 +196,6 @@ export class IpfsTransportProvider implements IMessagingProvider {
   }
 
   async stopService(address: string): Promise<boolean> {
-    const leaveRooms = async (roomsAddress: IterableIterator<string>) => {
-      let status
-      for (const roomAddress of roomsAddress) {
-        status = await this.stop(roomAddress)
-        if (!status) throw new Error(`Error leave room: ${roomAddress}`)
-      }
-    }
-    await leaveRooms(this._roomsMap.keys())
-    this._roomsMap.clear()
-    return true
+    return this._leaveRoom(address)
   }
 }
