@@ -23,6 +23,7 @@ export class IpfsTransportProvider implements IMessagingProvider {
   private _roomsMap: Map<string, any>
   private _options: IpfsTransportProviderOptions
   peerId: string
+  static _ipfsNodes: Ipfs[] = []
   private constructor(ipfsNode: Ipfs, options?: IpfsTransportProviderOptions) {
     this._options = { waitForPeers: true, ...options }
     this._ipfsNode = ipfsNode
@@ -38,6 +39,15 @@ export class IpfsTransportProvider implements IMessagingProvider {
     }
     return false
   }
+  static stop() {
+    return Promise.all(
+      IpfsTransportProvider._ipfsNodes.map(node => node.stop())
+    )
+  }
+  stopIpfsNode(): Promise<void> {
+    return this._ipfsNode.stop()
+  }
+
   async waitForPeer(
     address: any,
     peerId?: string,
@@ -54,13 +64,18 @@ export class IpfsTransportProvider implements IMessagingProvider {
       }, timeout)
     })
   }
-
+  static _createIpfsNode(): Promise<Ipfs> {
+    return createIpfsNode().then(node => {
+      IpfsTransportProvider._ipfsNodes.push(node)
+      return node
+    })
+  }
   static async create(): Promise<IpfsTransportProvider> {
     if (!IpfsTransportProvider._defaultIpfsNode) {
       if (IpfsTransportProvider._ipfsNodePromise) {
         IpfsTransportProvider._defaultIpfsNode = await IpfsTransportProvider._ipfsNodePromise
       } else {
-        IpfsTransportProvider._ipfsNodePromise = createIpfsNode()
+        IpfsTransportProvider._ipfsNodePromise = IpfsTransportProvider._createIpfsNode()
         IpfsTransportProvider._defaultIpfsNode = await IpfsTransportProvider._ipfsNodePromise
         IpfsTransportProvider._ipfsNodePromise = null
       }
@@ -68,7 +83,7 @@ export class IpfsTransportProvider implements IMessagingProvider {
     return new IpfsTransportProvider(IpfsTransportProvider._defaultIpfsNode)
   }
   static async createAdditional(): Promise<IpfsTransportProvider> {
-    const ipfsNode = await createIpfsNode()
+    const ipfsNode = await IpfsTransportProvider._createIpfsNode()
     return new IpfsTransportProvider(ipfsNode)
   }
   private _getIpfsRoom(address: string, name?: string): any {
@@ -91,9 +106,14 @@ export class IpfsTransportProvider implements IMessagingProvider {
     return room
   }
 
-  async emitRemote(address: string, peerId: string, eventName: string, params: any) {
+  async emitRemote(
+    address: string,
+    peerId: string,
+    eventName: string,
+    params: any
+  ) {
     const room = this._roomsMap.get(address)
-    if(!room) {
+    if (!room) {
       throw new Error(`No open room at ${address}`)
     }
 
@@ -188,9 +208,9 @@ export class IpfsTransportProvider implements IMessagingProvider {
   async stopService(address: string): Promise<boolean> {
     const leaveRooms = async (roomsAddress: IterableIterator<string>) => {
       let status
-      for(const roomAddress of roomsAddress) {
+      for (const roomAddress of roomsAddress) {
         status = await this.stop(roomAddress)
-        if(!status) throw new Error(`Error leave room: ${roomAddress}`)
+        if (!status) throw new Error(`Error leave room: ${roomAddress}`)
       }
     }
     await leaveRooms(this._roomsMap.keys())
