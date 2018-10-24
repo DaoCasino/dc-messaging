@@ -5,7 +5,6 @@ import { Logger } from "dc-logging"
 const defaultSwarm = [
   "/dns4/signal2.dao.casino/tcp/443/wss/p2p-websocket-star/",
   "/dns4/signal1.dao.casino/tcp/443/wss/p2p-websocket-star/",
-
   "/dns4/signal3.dao.casino/tcp/443/wss/p2p-websocket-star/"
 ]
 const logger = new Logger("createIpfsNode")
@@ -47,5 +46,16 @@ export function createIpfsNode(
     Swarm.push(Swarm.shift())
     logger.info(`Trying to create ipfs node with swarm top ${Swarm[0]}`)
     return createIpfsNode(Swarm, attempt + 1)
+  })
+}
+
+export function destroyIpfsNode(ipfs: Ipfs): Promise<void> {
+  return new Promise((resolve, reject) => {
+    ipfs.stop(error => {
+      if(error) {
+        reject(error)
+      }
+      resolve()
+    })
   })
 }
