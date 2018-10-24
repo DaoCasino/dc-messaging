@@ -38,3 +38,14 @@ export function createIpfsNode(yourSwarm = []): Promise<Ipfs> {
       })
   })
 }
+
+export function destroyIpfsNode(ipfs: Ipfs): Promise<void> {
+  return new Promise((resolve, reject) => {
+    ipfs.stop(error => {
+      if(error) {
+        reject(error)
+      }
+      resolve()
+    })
+  })
+}
