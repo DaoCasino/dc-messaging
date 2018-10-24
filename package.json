@@ -8,7 +8,7 @@
     "build": "yarn typescript",
     "clean": "rimraf lib",
     "typescript": "tsc --build",
-    "test:ipfs": "mocha -r ts-node/register src/__tests__/ipfsTransportProvider.test.ts"
+    "test:ipfs": "mocha --timeout 999999999 -r ts-node/register src/__tests__/ipfsTransportProvider.test.ts"
   },
   "keywords": [],
   "author": "",
