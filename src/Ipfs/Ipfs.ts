@@ -1,12 +1,10 @@
 import Ipfs from "ipfs"
 import { getRepoPath } from "./Utils"
 import { Logger } from "dc-logging"
+import { config } from "dc-configs"
 
-const defaultSwarm = [
-  "/dns4/signal1.dao.casino/tcp/443/wss/p2p-websocket-star/",
-  "/dns4/signal2.dao.casino/tcp/443/wss/p2p-websocket-star/",
-  "/dns4/signal3.dao.casino/tcp/443/wss/p2p-websocket-star/"
-]
+const defaultSwarm = config.default.signalServersSwarm
+
 const logger = new Logger("createIpfsNode")
 export function createIpfsNode(
   Swarm: string[] = defaultSwarm,
@@ -52,7 +50,7 @@ export function createIpfsNode(
 export function destroyIpfsNode(ipfs: Ipfs): Promise<void> {
   return new Promise((resolve, reject) => {
     ipfs.stop(error => {
-      if(error) {
+      if (error) {
         reject(error)
       }
       resolve()
