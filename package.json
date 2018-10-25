@@ -15,14 +15,14 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@types/node": "^10.11.7",
+    "chai": "^4.1.2",
     "dc-configs": "^0.1.1",
     "dc-logging": "^0.1.1",
     "ipfs": "0.31.7",
     "ipfs-pubsub-room": "1.4.0",
     "ipfs-repo": "0.23.1",
-    "ws": "^6.1.0",
     "mocha": "^3.2.0",
-    "chai": "^4.1.2"
+    "ws": "^6.1.0"
   },
   "devDependencies": {
     "husky": "1.1.1",
