@@ -3,8 +3,8 @@ import { getRepoPath } from "./Utils"
 import { Logger } from "dc-logging"
 
 const defaultSwarm = [
-  "/dns4/signal2.dao.casino/tcp/443/wss/p2p-websocket-star/",
   "/dns4/signal1.dao.casino/tcp/443/wss/p2p-websocket-star/",
+  "/dns4/signal2.dao.casino/tcp/443/wss/p2p-websocket-star/",
   "/dns4/signal3.dao.casino/tcp/443/wss/p2p-websocket-star/"
 ]
 const logger = new Logger("createIpfsNode")
