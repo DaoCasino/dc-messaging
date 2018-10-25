@@ -15,6 +15,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@types/node": "^10.11.7",
+    "dc-configs": "^0.1.0",
     "dc-logging": "^0.1.0",
     "ipfs": "0.31.7",
     "ipfs-pubsub-room": "1.4.0",
