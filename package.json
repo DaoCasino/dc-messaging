@@ -18,6 +18,7 @@
     "chai": "^4.1.2",
     "dc-configs": "^0.1.6",
     "dc-logging": "^0.1.6",
+    "dao-websocket-server": "^0.0.1",
     "ipfs": "0.31.7",
     "ipfs-pubsub-room": "1.4.0",
     "ipfs-repo": "0.23.1",
