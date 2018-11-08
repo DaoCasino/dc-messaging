@@ -3,13 +3,19 @@ import ws from 'ws'
 import { RemoteProxy, getId } from '../utils/RemoteProxy'
 import { ServiceWrapper } from '../utils/ServiceWrapper'
 
-export class WebsocketTransportProvider {
+export class WebSocketTransportProvider {
   private _wsMap: Map<string, any>
   peerId: string
   private _wsStartPromise
   private constructor() {
     this._wsMap = new Map()
   }
+
+  static async create(): Promise<WebSocketTransportProvider> {
+    // const ipfsNode = await createIpfsNode()
+    return new WebSocketTransportProvider()
+  }
+
   private _getClient(address: string): any {
     let client = this._wsMap.get(address)
     if (!client) {
