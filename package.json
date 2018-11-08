@@ -1,6 +1,6 @@
 {
   "name": "dc-messaging",
-  "version": "0.1.4",
+  "version": "0.1.7",
   "description": "Messaging transport providers",
   "main": "./lib/index",
   "scripts": {
@@ -16,8 +16,8 @@
   "dependencies": {
     "@types/node": "^10.11.7",
     "chai": "^4.1.2",
-    "dc-configs": "^0.1.4",
-    "dc-logging": "^0.1.4",
+    "dc-configs": "^0.1.6",
+    "dc-logging": "^0.1.6",
     "ipfs": "0.31.7",
     "ipfs-pubsub-room": "1.4.0",
     "ipfs-repo": "0.23.1",
