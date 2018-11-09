@@ -89,14 +89,21 @@ interface WebSocketTransportProviderOptions {
   waitForPeers: boolean
 }
 
-const DEFAULT_PEER_TIMEOUT = 10000
-const WEB_SOCKET_SERVER = `ws://localhost:8000`
+const DEFAULT_PEER_TIMEOUT = 20000
+const WEB_SOCKET_SERVER = `ws://localhost:8888`
+
+const randomString = () =>
+  Math.random()
+    .toString(36)
+    .substring(2, 15) +
+  Math.random()
+    .toString(36)
+    .substring(2, 15)
 
 export class WebSocketTransportProvider implements IMessagingProvider {
   private _ws: WebSocket
   private _roomsMap: Map<string, any>
   private _options: WebSocketTransportProviderOptions
-  peerId: string
   private constructor(ws: WebSocket, options?: WebSocketTransportProviderOptions) {
     this._options = { waitForPeers: true, ...options }
     this._ws = ws
@@ -126,7 +133,9 @@ export class WebSocketTransportProvider implements IMessagingProvider {
     timeout: number = DEFAULT_PEER_TIMEOUT
   ): Promise<any> {
     return new Promise((resolve, reject) => {
-      this._getWebSocketRoom(address).once("peer joined", id => {
+      const room = this._getWebSocketRoom(address)
+      room.once("peer joined", id => {
+        console.log({ address, room })
         if (!peerId || peerId === id) {
           resolve()
         }
@@ -139,7 +148,7 @@ export class WebSocketTransportProvider implements IMessagingProvider {
 
   static async create(): Promise<WebSocketTransportProvider> {
     const ws = new WebSocket(WEB_SOCKET_SERVER)
-    return new WebSocketTransportProvider(ws)
+    return Promise.resolve(new WebSocketTransportProvider(ws))
   }
 
   async destroy() {
@@ -151,7 +160,7 @@ export class WebSocketTransportProvider implements IMessagingProvider {
         this._ws.on('open', () => {
             this._ws.close()
             this._ws = null
-        }) 
+        })
     }
   }
 
@@ -162,10 +171,11 @@ export class WebSocketTransportProvider implements IMessagingProvider {
         .on("error", error => {
           logger.error(error)
         })
-        .on("peer joined", id => {
+        .on("peer joined", async id => {
           const roomName = `${name || ""} ${address}`
+          const myPeerId = await room.getPeerId()
           logger.debug(
-            `Peer joined ${id} to ${this._ws.id} in room ${roomName}`
+            `Peer joined ${id} to ${myPeerId} in room ${roomName}`
           )
         })
       logger.debug(`Room started ${address}`)
@@ -186,11 +196,13 @@ export class WebSocketTransportProvider implements IMessagingProvider {
       throw new Error(`No open room at ${address}`)
     }
 
+    const from = await room.getPeerId()
+
     const eventMessage: EventMessage = {
       id: getId(),
       eventName,
       params: [params], // TODO: ???
-      from: this.peerId
+      from
     }
 
     try {
@@ -198,15 +210,6 @@ export class WebSocketTransportProvider implements IMessagingProvider {
     } catch (error) {
       throw error
     }
-  }
-
-  getPeerId(address: string): Promise<string> {
-    const room = this._roomsMap.get(address)
-    if (!room) {
-      throw new Error(`No open room at ${address}`)
-    }
-
-    return room.getPeerId()
   }
 
   getRemoteInterface<TRemoteInterface>(
@@ -221,18 +224,20 @@ export class WebSocketTransportProvider implements IMessagingProvider {
     const proxy = new RemoteProxy()
     const self = this
     webSocketRoom.on("message", async message => {
-      const myPeerId = await webSocketRoom.getPeerId()
-      if (message.from !== myPeerId) {
+      const peerId = await webSocketRoom.getPeerId()
+
+      if (message.from !== peerId) {
         proxy.onMessage(JSON.parse(message.data))
       }
     })
-    return this.waitForPeer(address).then(() => {
+    // return this.waitForPeer(address).then(() => {
       const proxyInterface: TRemoteInterface = proxy.getProxy(message => {
         webSocketRoom.broadcast(JSON.stringify(message))
       })
+      console.log(proxyInterface)
       // const res: any = { v: proxyInterface }
       return Promise.resolve(proxyInterface as TRemoteInterface)
-    })
+    // })
   }
 
   exposeSevice(address: string, service: any, isEventEmitter: boolean = false) {
@@ -250,8 +255,8 @@ export class WebSocketTransportProvider implements IMessagingProvider {
         if (eventName) {
           await webSocketRoom.broadcast(JSON.stringify(response))
         } else {
-          const myPeerId = await webSocketRoom.getPeerId()
-          if (from !== myPeerId) {
+          const peerId = await webSocketRoom.getPeerId()
+          if (from !== peerId) {
             try {
               await webSocketRoom.sendTo(from, JSON.stringify(response))
             } catch (error) {
@@ -272,8 +277,8 @@ export class WebSocketTransportProvider implements IMessagingProvider {
     }
     webSocketRoom.on("message", async message => {
       const { from } = message
-      const myPeerId = await webSocketRoom.getPeerId()
-      if (from !== myPeerId) {
+      const peerId = await webSocketRoom.getPeerId()
+      if (from !== peerId) {
         const data = JSON.parse(message.data)
         if (data.method) {
           wrapper.onRequest({ ...data, from })
