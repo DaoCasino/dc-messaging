@@ -31,8 +31,21 @@ interface IMessagingProvider {
   ) => Promise<TRemoteInterface>
   exposeSevice: (address: string, service: any, isEventEmitter: boolean) => void
   stopService: (adress: string) => Promise<boolean>
-  // static create: () => IMessagingProvider
-  // destroy: () => void
+  // create: () => Promise<IMessagingProvider>
+  destroy: () => void
+}
+
+export enum TransportType {
+  IPFS = 0,
+  WS,
+  DIRECT
+}
+
+export interface ITransportFactory {
+  create: () => Promise<IMessagingProvider>
+  setType: (type: TransportType) => void
+  getType: () => TransportType
+  toString: () => string
 }
 
 export {

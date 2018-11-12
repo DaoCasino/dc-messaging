@@ -1,10 +1,10 @@
 import { describe, it } from "mocha"
 import { expect } from "chai"
 import { Logger } from "dc-logging"
-import { WebSocketTransportProvider } from "../ws/WebSocketTransportProvider"
-import { IpfsTransportProvider } from "../Ipfs/IpfsTransportProvider"
-import { IMessagingProvider } from "../Interfaces"
-import { EventEmitter } from "events"
+import { IMessagingProvider, ITransportFactory, TransportType } from "../Interfaces"
+import { TransportFactory } from "../utils/TransportFactory"
+
+const log = new Logger("Transport provider")
 
 interface ITestService {
     sum: (a:number, b:number) => number
@@ -21,53 +21,26 @@ class TestService implements ITestService {
         this._address = address
         provider.exposeSevice(address, this, false)
 
-        console.log(`Test service started at "${address}".`)
+        log.debug(`Test service started at "${address}".`)
     }
     stop(): Promise<boolean> {
         return this._provider.stopService(this._address)
     }
 }
 
-const log = new Logger("Transport provider")
-
-
-// describe('IPFS Transport provider test', () => {
-//     it('Create TestService', async () => {
-//         const ROOM_ADDRESS = 'test'
-//         const serviceProvider = await IpfsTransportProvider.create()
-//         const testService = new TestService()
-//         testService.start(ROOM_ADDRESS, serviceProvider)
-
-//         expect(testService.sum(1, 1)).to.be.equal(2)
-
-//         const remoteProvider = await IpfsTransportProvider.create()
-//         const remoteTestService = await remoteProvider.getRemoteInterface<ITestService>(ROOM_ADDRESS, "Remote IPFS TestService interface")
-
-//         const result = await remoteTestService.sum(1, 1)
-//         // console.log(remoteTestService)
-//         expect(result).to.be.equal(2)
-
-//         testService.stop()
-//         remoteProvider.destroy()
-//         serviceProvider.destroy()
-//     })
-// })
-
-describe('WebSocket Transport provider test', () => {
+const test = (factory: ITransportFactory) => describe(`Transport provider: ${factory.toString()}`, () => {
     it('Create TestService', async () => {
         const ROOM_ADDRESS = 'test'
-        const serviceProvider = await WebSocketTransportProvider.create()
+        const serviceProvider = await factory.create()
         const testService = new TestService()
         testService.start(ROOM_ADDRESS, serviceProvider)
 
         expect(testService.sum(1, 1)).to.be.equal(2)
 
-        const remoteProvider = await WebSocketTransportProvider.create()
+        const remoteProvider = await factory.create()
         const remoteTestService = await remoteProvider.getRemoteInterface<ITestService>(ROOM_ADDRESS, "Remote WS TestService interface")
 
-        // // console.log(remoteTestService)
         const result = await remoteTestService.sum(1, 1)
-        console.log({ result })
         expect(result).to.be.equal(2)
 
         testService.stop()
@@ -75,3 +48,8 @@ describe('WebSocket Transport provider test', () => {
         serviceProvider.destroy()
     })
 })
+
+const transportFactory = new TransportFactory(TransportType.IPFS)
+test(transportFactory)
+transportFactory.setType(TransportType.WS)
+test(transportFactory)

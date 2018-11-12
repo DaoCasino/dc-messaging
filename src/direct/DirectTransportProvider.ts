@@ -22,4 +22,9 @@ export class DirectTransportProvider implements IMessagingProvider {
       resolve(status)
     })
   }
+
+  static create() {
+    return Promise.resolve(new DirectTransportProvider())
+  }
+  destroy() {}
 }
