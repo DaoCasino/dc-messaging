@@ -5,8 +5,8 @@ import { DirectTransportProvider } from "../direct/DirectTransportProvider"
 
 export class TransportFactory implements ITransportFactory {
     private _type: TransportType
-    constructor(type: TransportType) {
-        this.setType(type)
+    constructor(type?: TransportType) {
+        if (type) this.setType(type)
     }
 
     setType(type: TransportType) {

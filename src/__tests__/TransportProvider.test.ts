@@ -49,7 +49,8 @@ const test = (factory: ITransportFactory) => describe(`Transport provider: ${fac
     })
 })
 
-const transportFactory = new TransportFactory(TransportType.IPFS)
+const transportFactory = new TransportFactory()
+transportFactory.setType(TransportType.IPFS)
 test(transportFactory)
 transportFactory.setType(TransportType.WS)
 test(transportFactory)
