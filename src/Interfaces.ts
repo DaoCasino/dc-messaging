@@ -1,3 +1,5 @@
+import { create } from "domain";
+
 type UserId = string
 
 interface RoomInfo {
@@ -31,6 +33,7 @@ interface IMessagingProvider {
   exposeSevice: (address: string, service: any, isEventEmitter: boolean) => void
   stopService: (adress: string) => Promise<boolean>
 }
+
 export {
   IMessagingProvider,
   ResponseMessage,
