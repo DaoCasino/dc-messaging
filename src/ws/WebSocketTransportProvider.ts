@@ -135,7 +135,7 @@ export class WebSocketTransportProvider implements IMessagingProvider {
     return new Promise((resolve, reject) => {
       const room = this._getWebSocketRoom(address)
       room.once("peer joined", id => {
-        console.log({ address, room })
+        // console.log({ address, room })
         if (!peerId || peerId === id) {
           resolve()
         }
@@ -230,14 +230,14 @@ export class WebSocketTransportProvider implements IMessagingProvider {
         proxy.onMessage(JSON.parse(message.data))
       }
     })
-    // return this.waitForPeer(address).then(() => {
+    return this.waitForPeer(address).then(() => {
       const proxyInterface: TRemoteInterface = proxy.getProxy(message => {
         webSocketRoom.broadcast(JSON.stringify(message))
       })
-      console.log(proxyInterface)
+      // console.log(proxyInterface)
       // const res: any = { v: proxyInterface }
       return Promise.resolve(proxyInterface as TRemoteInterface)
-    // })
+    })
   }
 
   exposeSevice(address: string, service: any, isEventEmitter: boolean = false) {

@@ -1,5 +1,3 @@
-import { create } from "domain";
-
 type UserId = string
 
 interface RoomInfo {
@@ -28,10 +26,13 @@ interface ResponseMessage {
 
 interface IMessagingProvider {
   getRemoteInterface: <TRemoteInterface>(
-    address: string
+    address: string,
+    roomName?: string
   ) => Promise<TRemoteInterface>
   exposeSevice: (address: string, service: any, isEventEmitter: boolean) => void
   stopService: (adress: string) => Promise<boolean>
+  // static create: () => IMessagingProvider
+  // destroy: () => void
 }
 
 export {

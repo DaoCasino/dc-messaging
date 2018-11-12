@@ -28,8 +28,11 @@ export class RemoteProxy {
       {
         get: (target, prop: string) => {
           if (prop === "then") return null
+          if (prop === "constructor") return null
+          if (prop === "inspect") return null
+          if (typeof prop === 'symbol') return null
           if (prop === "on") return _self._handleSubscribe.bind(_self)
-          if (!prop.startsWith("_")) {
+          if (prop && prop.startsWith && !prop.startsWith("_")) {
             return async (...params): Promise<any> => {
               const id = getId()
               sendRequest({ method: prop, params, id })
