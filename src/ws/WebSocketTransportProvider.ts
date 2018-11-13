@@ -1,78 +1,3 @@
-// import { RoomInfo } from '../Interfaces'
-// import ws from 'ws'
-// import { RemoteProxy, getId } from '../utils/RemoteProxy'
-// import { ServiceWrapper } from '../utils/ServiceWrapper'
-
-// export class WebSocketTransportProvider {
-//   private _wsMap: Map<string, any>
-//   peerId: string
-//   private _wsStartPromise
-//   private constructor() {
-//     this._wsMap = new Map()
-//   }
-
-//   static async create(): Promise<WebSocketTransportProvider> {
-//     // const ipfsNode = await createIpfsNode()
-//     return new WebSocketTransportProvider()
-//   }
-
-//   private _getClient(address: string): any {
-//     let client = this._wsMap.get(address)
-//     if (!client) {
-//       client = ws.Client(address, {})
-//       client.this._wsMap.set(address, client)
-//     }
-//     return client
-//   }
-//   private _getServer(address: string): any {
-//     let client = this._wsMap.get(address)
-//     if (!client) {
-//       client = ws.Server(address, {})
-//       client.this._wsMap.set(address, client)
-//     }
-//     return client
-//   }
-
-//   getRemoteInterface<TRemoteInterface>(
-//     address: string,
-//     roomInfo?: RoomInfo
-//   ): Promise<TRemoteInterface> {
-//     const client = new ws.Client(address)
-
-//     const proxy = new RemoteProxy()
-//     const self = this
-//     client.on('message', message => {
-//       proxy.onMessage(JSON.parse(message))
-//     })
-//     return Promise.resolve(
-//       proxy.getProxy(message => client.send(JSON.stringify(message)))
-//     )
-//   }
-
-//   exposeSevice(address: string, service: any, isEventEmitter: boolean = false) {
-//     const server = this._getServer(address)
-
-//     // todo - that's bullshit
-//     const wrapper = new ServiceWrapper(
-//       service,
-//       async response => {
-//         try {
-//           const { from } = response
-//           await server.send(from, JSON.stringify(response))
-//         } catch (error) {
-//           throw error
-//         }
-//       },
-//       isEventEmitter
-//     )
-//     server.on('message', message => {
-//       const { from } = message
-//       wrapper.onRequest({ ...JSON.parse(message.data), from })
-//     })
-//   }
-// }
-
-
 import WebSocket from 'ws'
 import { Room } from 'dao-websocket-server' // TODO: исправить
 import {
@@ -113,18 +38,17 @@ export class WebSocketTransportProvider implements IMessagingProvider {
   private async _leaveRoom(address): Promise<boolean> {
     const room = this._roomsMap.get(address)
     if (room) {
-      await room.leave()
-      this._roomsMap.delete(address)
-      return true
+      if(await room.leave() === true) {
+        return this._roomsMap.delete(address)
+      }
     }
     return false
   }
 
   private async _leaveRooms() {
-    for (const room of this._roomsMap.values()) {
-      await room.leave()
+    for (const address of this._roomsMap.keys()) {
+      await this._leaveRoom(address) // TODO: возможно нужно вставить проверку на статус и выдавать error
     }
-    this._roomsMap.clear()
   }
 
   async waitForPeer(

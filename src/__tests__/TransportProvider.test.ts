@@ -1,8 +1,8 @@
 import { describe, it } from "mocha"
 import { expect } from "chai"
 import { Logger } from "dc-logging"
-import { IMessagingProvider, ITransportFactory, TransportType } from "../Interfaces"
-import { TransportFactory } from "../utils/TransportFactory"
+import { IMessagingProvider, ITransportProviderFactory, TransportType } from "../Interfaces"
+import { TransportProviderFactory } from "../TransportProviderFactory"
 
 const log = new Logger("Transport provider")
 
@@ -28,7 +28,7 @@ class TestService implements ITestService {
     }
 }
 
-const test = (factory: ITransportFactory) => describe(`Transport provider: ${factory.toString()}`, () => {
+const test = (factory: ITransportProviderFactory) => describe(`Transport provider: ${factory.toString()}`, () => {
     it('Create TestService', async () => {
         const ROOM_ADDRESS = 'test'
         const serviceProvider = await factory.create()
@@ -40,8 +40,12 @@ const test = (factory: ITransportFactory) => describe(`Transport provider: ${fac
         const remoteProvider = await factory.create()
         const remoteTestService = await remoteProvider.getRemoteInterface<ITestService>(ROOM_ADDRESS, "Remote WS TestService interface")
 
-        const result = await remoteTestService.sum(1, 1)
-        expect(result).to.be.equal(2)
+        try {
+            const result = await remoteTestService.sum(1, 1)
+            expect(result).to.be.equal(2)
+        } catch(e) {
+            log.error(e)
+        }
 
         testService.stop()
         remoteProvider.destroy()
@@ -49,8 +53,7 @@ const test = (factory: ITransportFactory) => describe(`Transport provider: ${fac
     })
 })
 
-const transportFactory = new TransportFactory()
-transportFactory.setType(TransportType.IPFS)
-test(transportFactory)
-transportFactory.setType(TransportType.WS)
-test(transportFactory)
+
+test(new TransportProviderFactory(TransportType.IPFS))
+test(new TransportProviderFactory(TransportType.WS))
+test(new TransportProviderFactory(TransportType.DIRECT))

@@ -36,12 +36,12 @@ interface IMessagingProvider {
 }
 
 export enum TransportType {
-  IPFS = 0,
+  IPFS = 1,
   WS,
   DIRECT
 }
 
-export interface ITransportFactory {
+export interface ITransportProviderFactory {
   create: () => Promise<IMessagingProvider>
   setType: (type: TransportType) => void
   getType: () => TransportType
