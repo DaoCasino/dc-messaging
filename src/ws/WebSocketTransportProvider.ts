@@ -7,6 +7,7 @@ import {
 import { RemoteProxy, getId } from "../utils/RemoteProxy"
 import { ServiceWrapper } from "../utils/ServiceWrapper"
 import { Logger } from "dc-logging"
+import { config, TransportType } from "dc-configs"
 
 const logger = new Logger("WebSocketTransportProvider")
 
@@ -14,8 +15,10 @@ interface WebSocketTransportProviderOptions {
   waitForPeers: boolean
 }
 
+const defaultSwarm = config.default.transportServersSwarm[TransportType.WS]
+
 const DEFAULT_PEER_TIMEOUT = 20000
-const WEB_SOCKET_SERVER = `ws://localhost:8888`
+const WEB_SOCKET_SERVER = defaultSwarm[0] // TODO: need select or balance
 
 const randomString = () =>
   Math.random()
