@@ -1,3 +1,5 @@
+import { TransportType } from "dc-configs"
+
 type UserId = string
 
 interface RoomInfo {
@@ -32,13 +34,8 @@ interface IMessagingProvider {
   exposeSevice: (address: string, service: any, isEventEmitter: boolean) => void
   stopService: (adress: string) => Promise<boolean>
   // create: () => Promise<IMessagingProvider>
-  destroy: () => void
-}
-
-export enum TransportType {
-  IPFS = 1,
-  WS,
-  DIRECT
+  destroy: () => void,
+  emitRemote: (address: string, peerId: string, eventName: string, params: any) => Promise<void>
 }
 
 export interface ITransportProviderFactory {

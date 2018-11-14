@@ -1,7 +1,8 @@
 import { describe, it } from "mocha"
 import { expect } from "chai"
 import { Logger } from "dc-logging"
-import { IMessagingProvider, ITransportProviderFactory, TransportType } from "../Interfaces"
+import { IMessagingProvider, ITransportProviderFactory } from "../Interfaces"
+import { TransportType } from "dc-configs"
 import { TransportProviderFactory } from "../TransportProviderFactory"
 
 const log = new Logger("Transport provider")

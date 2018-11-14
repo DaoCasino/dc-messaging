@@ -25,4 +25,29 @@ export class DirectTransportProvider implements IMessagingProvider {
   destroy() {
     gServices.clear()
   }
+
+  async emitRemote(
+    address: string,
+    peerId: string,
+    eventName: string,
+    params: any
+  ) {
+    // const room = this._roomsMap.get(address)
+    // if (!room) {
+    //   throw new Error(`No open room at ${address}`)
+    // }
+
+    // const eventMessage: EventMessage = {
+    //   id: getId(),
+    //   eventName,
+    //   params: [params], // TODO: ???
+    //   from: this.peerId
+    // }
+
+    // try {
+    //   await room.sendTo(peerId, JSON.stringify(eventMessage))
+    // } catch (error) {
+    //   throw error
+    // }
+  }
 }
