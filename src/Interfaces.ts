@@ -1,4 +1,4 @@
-import { create } from "domain";
+import { TransportType } from "dc-configs"
 
 type UserId = string
 
@@ -28,10 +28,21 @@ interface ResponseMessage {
 
 interface IMessagingProvider {
   getRemoteInterface: <TRemoteInterface>(
-    address: string
+    address: string,
+    roomName?: string
   ) => Promise<TRemoteInterface>
   exposeSevice: (address: string, service: any, isEventEmitter: boolean) => void
   stopService: (adress: string) => Promise<boolean>
+  // create: () => Promise<IMessagingProvider>
+  destroy: () => void,
+  emitRemote: (address: string, peerId: string, eventName: string, params: any) => Promise<void>
+}
+
+export interface ITransportProviderFactory {
+  create: () => Promise<IMessagingProvider>
+  setType: (type: TransportType) => void
+  getType: () => TransportType
+  toString: () => string
 }
 
 export {
