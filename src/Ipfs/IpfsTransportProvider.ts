@@ -8,9 +8,10 @@ import { RemoteProxy, getId } from "../utils/RemoteProxy"
 import { createIpfsNode, destroyIpfsNode } from "./Ipfs"
 import { ServiceWrapper } from "../utils/ServiceWrapper"
 import { Logger } from "dc-logging"
+import { config } from "dc-configs"
 
 
-const DEFAULT_PEER_TIMEOUT = 10000
+const DEFAULT_PEER_TIMEOUT = config.default.waitForPeerTimeout
 
 interface IpfsTransportProviderOptions {
   waitForPeers: boolean
