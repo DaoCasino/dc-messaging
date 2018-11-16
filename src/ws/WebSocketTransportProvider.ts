@@ -17,7 +17,7 @@ interface WebSocketTransportProviderOptions {
 
 const defaultSwarm = config.default.transportServersSwarm[TransportType.WS]
 
-const DEFAULT_PEER_TIMEOUT = 20000
+const DEFAULT_PEER_TIMEOUT = config.default.waitForPeerTimeout
 const WEB_SOCKET_SERVER = defaultSwarm[0] // TODO: need select or balance
 
 const randomString = () =>
