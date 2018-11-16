@@ -1,5 +1,5 @@
 import WebSocket from 'ws'
-import { Room } from 'dao-websocket-server' // TODO: исправить
+import { Room } from './pubsub-room' // TODO: исправить
 import {
   IMessagingProvider,
   EventMessage
