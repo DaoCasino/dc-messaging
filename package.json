@@ -9,7 +9,8 @@
     "clean": "rimraf lib",
     "typescript": "tsc --build",
     "test:ipfs": "mocha --timeout 999999999 -r ts-node/register src/__tests__/ipfsTransportProvider.test.ts",
-    "test:tp": "mocha --timeout 999999999 -r ts-node/register src/__tests__/TransportProvider.test.ts"
+    "test:tp": "mocha --timeout 999999999 -r ts-node/register src/__tests__/TransportProvider.test.ts",
+    "test:wsroom": "mocha --timeout 999999999 -r ts-node/register src/__tests__/ws/pubsub-room.test.ts"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +19,6 @@
     "@types/node": "^10.11.7",
     "@types/ws": "^6.0.1",
     "chai": "^4.1.2",
-    "dao-websocket-server": "^0.0.1",
     "dc-configs": "^0.1.6",
     "dc-logging": "^0.1.6",
     "ipfs": "0.31.7",
