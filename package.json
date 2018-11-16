@@ -10,7 +10,7 @@
     "typescript": "tsc --build",
     "test:ipfs": "mocha --timeout 999999999 -r ts-node/register src/__tests__/ipfsTransportProvider.test.ts",
     "test:tp": "mocha --timeout 999999999 -r ts-node/register src/__tests__/TransportProvider.test.ts",
-    "test:wsroom": "mocha --timeout 999999999 -r ts-node/register src/__tests__/ws/client.test.ts"
+    "test:wsroom": "mocha --timeout 999999999 -r ts-node/register src/__tests__/ws/pubsub-room.test.ts"
   },
   "keywords": [],
   "author": "",
