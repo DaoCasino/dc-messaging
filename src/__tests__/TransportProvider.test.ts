@@ -26,6 +26,7 @@ class TestService implements ITestService {
 
     checkFiles (info: FileUpload) {
         const files = readFiles(__dirname)
+        console.log({ remote: info.files, original: files.files })
         expect(info).to.deep.equal(files)
     }
 
@@ -70,6 +71,7 @@ const test = (factory: ITransportProviderFactory) => describe(`Transport provide
         try {
             const result = await remoteTestService.sum(1, 1)
             expect(result).to.be.equal(2)
+            remoteTestService.checkFiles(files)
         } catch(e) {
             log.error(e)
         }
