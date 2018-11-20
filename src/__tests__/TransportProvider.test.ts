@@ -49,7 +49,7 @@ const readFiles = (openDir: string): FileUpload => {
     }).map(fileName => {
       const filePath = path.join(openDir, fileName)
       const { size } = fs.statSync(filePath)
-      return { fileName, fileData: fs.readFileSync(filePath), fileSize: size }
+      return { fileName, fileData: fs.readFileSync(filePath).toString('base64'), fileSize: size }
     })
 
     return { files }
