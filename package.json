@@ -1,6 +1,6 @@
 {
   "name": "dc-messaging",
-  "version": "0.1.7",
+  "version": "0.1.23",
   "description": "Messaging transport providers",
   "main": "./lib/index",
   "scripts": {
@@ -8,17 +8,19 @@
     "build": "yarn typescript",
     "clean": "rimraf lib",
     "typescript": "tsc --build",
-    "test:ipfs": "mocha --timeout 999999999 -r ts-node/register src/__tests__/ipfsTransportProvider.test.ts"
+    "test:ipfs": "mocha --timeout 999999999 -r ts-node/register src/__tests__/ipfsTransportProvider.test.ts",
+    "test:tp": "mocha --timeout 999999999 -r ts-node/register src/__tests__/TransportProvider.test.ts",
+    "test:wsroom": "mocha --timeout 999999999 -r ts-node/register src/__tests__/ws/pubsub-room.test.ts"
   },
   "keywords": [],
   "author": "",
   "license": "GPL-3.0",
   "dependencies": {
     "@types/node": "^10.11.7",
+    "@types/ws": "^6.0.1",
     "chai": "^4.1.2",
-    "dc-configs": "^0.1.6",
-    "dc-logging": "^0.1.6",
-    "dao-websocket-server": "^0.0.1",
+    "dc-configs": "^0.1.23",
+    "dc-logging": "^0.1.15",
     "ipfs": "0.31.7",
     "ipfs-pubsub-room": "1.4.0",
     "ipfs-repo": "0.23.1",
@@ -30,5 +32,5 @@
     "tslint": "5.11.0",
     "typescript": "^3.1.2"
   },
-  "gitHead": "865d20c921eb00208778bbdcbb47fe95c2b4ed38"
+  "gitHead": "3e5dcaecc303cdce6b606ab1fc570c530592eef4"
 }

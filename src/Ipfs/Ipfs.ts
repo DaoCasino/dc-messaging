@@ -1,9 +1,9 @@
 import Ipfs from "ipfs"
 import { getRepoPath } from "./Utils"
 import { Logger } from "dc-logging"
-import { config } from "dc-configs"
+import { config, TransportType } from "dc-configs"
 
-const defaultSwarm = config.default.signalServersSwarm
+const defaultSwarm = config.default.transportServersSwarm[TransportType.IPFS]
 
 const logger = new Logger("createIpfsNode")
 export function createIpfsNode(
