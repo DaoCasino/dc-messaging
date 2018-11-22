@@ -86,9 +86,10 @@ export class ServiceWrapper<TService> {
     }
     if (!response.error) {
       try {
-        // this.logger.debug(`call method ${method}`);
+        this.logger.debug(`call method ${method}`)
         response.result = await func.call(this._service, ...params)
       } catch (error) {
+        this.logger.debug(`response.error method ${method}`)
         response.error = { status: "ERROR", message: error.message }
       }
     }
