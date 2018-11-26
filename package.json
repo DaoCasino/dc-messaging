@@ -1,6 +1,6 @@
 {
   "name": "dc-messaging",
-  "version": "0.1.23",
+  "version": "0.1.31",
   "description": "Messaging transport providers",
   "main": "./lib/index",
   "scripts": {
@@ -19,8 +19,8 @@
     "@types/node": "^10.11.7",
     "@types/ws": "^6.0.1",
     "chai": "^4.1.2",
-    "dc-configs": "^0.1.23",
-    "dc-logging": "^0.1.15",
+    "dc-configs": "^0.1.31",
+    "dc-logging": "^0.1.31",
     "ipfs": "0.31.7",
     "ipfs-pubsub-room": "1.4.0",
     "ipfs-repo": "0.23.1",
