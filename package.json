@@ -1,6 +1,6 @@
 {
   "name": "dc-messaging",
-  "version": "0.1.23",
+  "version": "0.1.37",
   "description": "Messaging transport providers",
   "main": "./lib/index",
   "scripts": {
@@ -19,8 +19,8 @@
     "@types/node": "^10.11.7",
     "@types/ws": "^6.0.1",
     "chai": "^4.1.2",
-    "dc-configs": "^0.1.23",
-    "dc-logging": "^0.1.15",
+    "dc-configs": "^0.1.37",
+    "dc-logging": "^0.1.37",
     "ipfs": "0.31.7",
     "ipfs-pubsub-room": "1.4.0",
     "ipfs-repo": "0.23.1",
@@ -32,5 +32,5 @@
     "tslint": "5.11.0",
     "typescript": "^3.1.2"
   },
-  "gitHead": "3e5dcaecc303cdce6b606ab1fc570c530592eef4"
+  "gitHead": "33f46704e19499a4dafe61e7b11697c5adcf3b71"
 }
