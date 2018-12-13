@@ -1,4 +1,4 @@
-import { TransportType } from "dc-configs"
+import { TransportType } from "@daocasino/dc-configs"
 
 type UserId = string
 
