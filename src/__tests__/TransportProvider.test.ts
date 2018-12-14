@@ -82,8 +82,27 @@ const test = (factory: ITransportProviderFactory) => describe(`Transport provide
     })
 })
 
-
+switch (process.env.DC_TRANSPORT) {
+    case 'IPFS':
+        test(new TransportProviderFactory(TransportType.IPFS))
+        break
+    case 'WS':
+        test(new TransportProviderFactory(TransportType.WS))
+        break
+    case 'DIRECT':
+        test(new TransportProviderFactory(TransportType.DIRECT))
+        break
+    case 'LIBP2P':
+        test(new TransportProviderFactory(TransportType.LIBP2P))
+        break
+    default:
+        test(new TransportProviderFactory(TransportType.IPFS))
+        test(new TransportProviderFactory(TransportType.LIBP2P))
+        test(new TransportProviderFactory(TransportType.WS))
+        test(new TransportProviderFactory(TransportType.DIRECT))
+        break
+}
 // test(new TransportProviderFactory(TransportType.IPFS))
 // test(new TransportProviderFactory(TransportType.WS))
 // test(new TransportProviderFactory(TransportType.DIRECT))
-test(new TransportProviderFactory(TransportType.LIBP2P))
+// test(new TransportProviderFactory(TransportType.LIBP2P))
