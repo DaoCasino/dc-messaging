@@ -26,7 +26,7 @@ class TestService implements ITestService {
 
     checkFiles (info: FileUpload) {
         const files = readFiles(__dirname)
-        console.log({ remote: info.files, original: files.files })
+        // console.log({ remote: info.files, original: files.files })
         expect(info).to.deep.equal(files)
     }
 
@@ -66,7 +66,7 @@ const test = (factory: ITransportProviderFactory) => describe(`Transport provide
         testService.checkFiles(files)
 
         const remoteProvider = await factory.create()
-        const remoteTestService = await remoteProvider.getRemoteInterface<ITestService>(ROOM_ADDRESS, "Remote WS TestService interface")
+        const remoteTestService = await remoteProvider.getRemoteInterface<ITestService>(ROOM_ADDRESS, "Remote TestService interface")
 
         try {
             const result = await remoteTestService.sum(1, 1)
@@ -83,6 +83,7 @@ const test = (factory: ITransportProviderFactory) => describe(`Transport provide
 })
 
 
-test(new TransportProviderFactory(TransportType.IPFS))
-test(new TransportProviderFactory(TransportType.WS))
-test(new TransportProviderFactory(TransportType.DIRECT))
+// test(new TransportProviderFactory(TransportType.IPFS))
+// test(new TransportProviderFactory(TransportType.WS))
+// test(new TransportProviderFactory(TransportType.DIRECT))
+test(new TransportProviderFactory(TransportType.LIBP2P))
