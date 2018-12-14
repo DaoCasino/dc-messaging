@@ -6,7 +6,5 @@
     "outDir": "lib"
   },
   "include": ["src/**/*"],
-  "references": [
-    { "path": "../mock-ipfs" }
-  ]
+  "references": []
 }

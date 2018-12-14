@@ -1,4 +1,4 @@
-import MockIpfs from "mock-ipfs"
+import MockIpfs from "@daocasino/mock-ipfs"
 import { Logger } from "@daocasino/dc-logging"
 import { config, TransportType } from "@daocasino/dc-configs"
 

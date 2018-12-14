@@ -1,4 +1,4 @@
-import MockIpfs from "mock-ipfs"
+import MockIpfs from "@daocasino/mock-ipfs"
 import IpfsRoom from "ipfs-pubsub-room"
 import {
   IMessagingProvider,
