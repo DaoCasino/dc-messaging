@@ -10,6 +10,8 @@
     "typescript": "tsc --build",
     "test:ipfs": "mocha --timeout 999999999 -r ts-node/register src/__tests__/ipfsTransportProvider.test.ts",
     "test:tp": "mocha --timeout 999999999 -r ts-node/register src/__tests__/TransportProvider.test.ts",
+    "test:tp:libp2p": "DC_TRANSPORT=LIBP2P yarn test:tp",
+    "test:tp:direct": "DC_TRANSPORT=DIRECT yarn test:tp",
     "test:wsroom": "mocha --timeout 999999999 -r ts-node/register src/__tests__/ws/pubsub-room.test.ts"
   },
   "keywords": [],
@@ -25,7 +27,8 @@
     "ipfs-pubsub-room": "1.4.0",
     "ipfs-repo": "0.23.1",
     "mocha": "^3.2.0",
-    "ws": "^6.1.0"
+    "ws": "^6.1.0",
+    "@daocasino/mock-ipfs": "^0.1.0"
   },
   "devDependencies": {
     "husky": "1.1.1",
