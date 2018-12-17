@@ -56,14 +56,15 @@ export class Libp2pTransportProvider implements IMessagingProvider {
     timeout: number = DEFAULT_PEER_TIMEOUT
   ): Promise<any> {
     return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        reject(new Error("Waiting for peer timed out"))
+      }, timeout)
       this._getIpfsRoom(address).once("peer joined", id => {
         if (!peerId || peerId === id) {
+          clearTimeout(timer)
           resolve()
         }
       })
-      setTimeout(() => {
-        reject(new Error("Waiting for peer timed out"))
-      }, timeout)
     })
   }
 
