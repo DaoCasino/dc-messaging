@@ -2,7 +2,7 @@ import { IMessagingProvider, ITransportProviderFactory } from "./Interfaces"
 import { IpfsTransportProvider } from "./Ipfs/IpfsTransportProvider"
 import { WebSocketTransportProvider } from "./ws/WebSocketTransportProvider"
 import { DirectTransportProvider } from "./direct/DirectTransportProvider"
-import { config, TransportType } from "dc-configs"
+import { config, TransportType } from "@daocasino/dc-configs"
 
 export class TransportProviderFactory implements ITransportProviderFactory {
     private _type: TransportType

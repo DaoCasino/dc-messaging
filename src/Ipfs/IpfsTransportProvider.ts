@@ -7,8 +7,8 @@ import {
 import { RemoteProxy, getId } from "../utils/RemoteProxy"
 import { createIpfsNode, destroyIpfsNode } from "./Ipfs"
 import { ServiceWrapper } from "../utils/ServiceWrapper"
-import { Logger } from "dc-logging"
-import { config } from "dc-configs"
+import { Logger } from "@daocasino/dc-logging"
+import { config } from "@daocasino/dc-configs"
 
 
 const DEFAULT_PEER_TIMEOUT = config.default.waitForPeerTimeout

@@ -6,8 +6,8 @@ import {
 } from "../Interfaces"
 import { RemoteProxy, getId } from "../utils/RemoteProxy"
 import { ServiceWrapper } from "../utils/ServiceWrapper"
-import { Logger } from "dc-logging"
-import { config, TransportType } from "dc-configs"
+import { Logger } from "@daocasino/dc-logging"
+import { config, TransportType } from "@daocasino/dc-configs"
 
 const logger = new Logger("WebSocketTransportProvider")
 

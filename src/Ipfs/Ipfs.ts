@@ -1,7 +1,7 @@
 import Ipfs from "ipfs"
 import { getRepoPath } from "./Utils"
-import { Logger } from "dc-logging"
-import { config, TransportType } from "dc-configs"
+import { Logger } from "@daocasino/dc-logging"
+import { config, TransportType } from "@daocasino/dc-configs"
 
 const defaultSwarm = config.default.transportServersSwarm[TransportType.IPFS]
 

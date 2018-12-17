@@ -2,7 +2,7 @@ import WebSocket from 'ws'
 import { EventEmitter } from 'events'
 import { ResponseMessage, RequestMessage, SendToParams, LeaveRoomParams, StartRoomParams, GetPeersParams, HasPeerParams, BroadcastParams } from './Interfaces'
 import { Method } from './Constants'
-import { Logger } from 'dc-logging'
+import { Logger } from '@daocasino/dc-logging'
 
 const log = new Logger('Room:')
 

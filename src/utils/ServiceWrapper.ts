@@ -1,5 +1,5 @@
 import { ResponseMessage, RequestMessage, EventMessage } from "../Interfaces"
-import { Logger } from "dc-logging"
+import { Logger } from "@daocasino/dc-logging"
 
 let _id = 0
 export const getId = () => {
