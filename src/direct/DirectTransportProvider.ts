@@ -23,7 +23,7 @@ export class DirectTransportProvider implements IMessagingProvider {
     return Promise.resolve(new DirectTransportProvider())
   }
   destroy() {
-    gServices.clear()
+    return Promise.resolve(gServices.clear())
   }
 
   async emitRemote(
