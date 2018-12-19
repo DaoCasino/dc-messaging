@@ -1,6 +1,6 @@
 {
   "name": "@daocasino/dc-messaging",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "Messaging transport providers",
   "main": "./lib/index",
   "scripts": {
@@ -18,8 +18,8 @@
   "author": "",
   "license": "GPL-3.0",
   "dependencies": {
-    "@daocasino/dc-configs": "^0.2.0",
-    "@daocasino/dc-logging": "^0.2.0",
+    "@daocasino/dc-configs": "^0.2.2",
+    "@daocasino/dc-logging": "^0.2.2",
     "@types/node": "^10.11.7",
     "@types/ws": "^6.0.1",
     "chai": "^4.1.2",
