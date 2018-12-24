@@ -2,7 +2,8 @@ import { IMessagingProvider, ITransportProviderFactory } from "./Interfaces"
 import { IpfsTransportProvider } from "./Ipfs/IpfsTransportProvider"
 import { WebSocketTransportProvider } from "./ws/WebSocketTransportProvider"
 import { DirectTransportProvider } from "./direct/DirectTransportProvider"
-import { config, TransportType } from "dc-configs"
+import { config, TransportType } from "@daocasino/dc-configs"
+import { Libp2pTransportProvider } from "./libp2p/libp2pTransportProvider"
 
 export class TransportProviderFactory implements ITransportProviderFactory {
     private _type: TransportType
@@ -31,6 +32,8 @@ export class TransportProviderFactory implements ITransportProviderFactory {
                 return WebSocketTransportProvider.create()
             case TransportType.DIRECT:
                 return DirectTransportProvider.create()
+            case TransportType.LIBP2P:
+                return Libp2pTransportProvider.create()
         }
 
         throw new Error("Selected type doesn't exists")

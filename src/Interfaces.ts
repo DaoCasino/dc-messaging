@@ -1,4 +1,4 @@
-import { TransportType } from "dc-configs"
+import { TransportType } from "@daocasino/dc-configs"
 
 type UserId = string
 
@@ -34,7 +34,7 @@ interface IMessagingProvider {
   exposeSevice: (address: string, service: any, isEventEmitter: boolean) => void
   stopService: (adress: string) => Promise<boolean>
   // create: () => Promise<IMessagingProvider>
-  destroy: () => void,
+  destroy: () => Promise<void>,
   emitRemote: (address: string, peerId: string, eventName: string, params: any) => Promise<void>
 }
 

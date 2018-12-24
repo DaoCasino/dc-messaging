@@ -1,11 +1,11 @@
-import Ipfs from "ipfs"
+import MockIpfs from "@daocasino/mock-ipfs"
 import IpfsRoom from "ipfs-pubsub-room"
 import {
   IMessagingProvider,
   EventMessage
 } from "../Interfaces"
 import { RemoteProxy, getId } from "../utils/RemoteProxy"
-import { createIpfsNode, destroyIpfsNode } from "./Ipfs"
+import { createMockIpfsNode, destroyMockIpfsNode } from "./MockIpfs"
 import { ServiceWrapper } from "../utils/ServiceWrapper"
 import { Logger } from "@daocasino/dc-logging"
 import { config } from "@daocasino/dc-configs"
@@ -16,16 +16,17 @@ const DEFAULT_PEER_TIMEOUT = config.default.waitForPeerTimeout
 interface IpfsTransportProviderOptions {
   waitForPeers: boolean
 }
-const logger = new Logger("IpfsTransportProvider")
-export class IpfsTransportProvider implements IMessagingProvider {
+const logger = new Logger("Libp2pTransportProvider")
+
+export class Libp2pTransportProvider implements IMessagingProvider {
   // private static _defaultIpfsNode: Ipfs
   // private static _ipfsNodePromise: Promise<Ipfs>
-  private _ipfsNode: Ipfs
+  private _ipfsNode: MockIpfs
   private _roomsMap: Map<string, any>
   private _options: IpfsTransportProviderOptions
   peerId: string
   // static _ipfsNodes: Ipfs[] = []
-  private constructor(ipfsNode: Ipfs, options?: IpfsTransportProviderOptions) {
+  private constructor(ipfsNode: MockIpfs, options?: IpfsTransportProviderOptions) {
     this._options = { waitForPeers: true, ...options }
     this._ipfsNode = ipfsNode
     this.peerId = ipfsNode.id
@@ -55,25 +56,26 @@ export class IpfsTransportProvider implements IMessagingProvider {
     timeout: number = DEFAULT_PEER_TIMEOUT
   ): Promise<any> {
     return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        reject(new Error("Waiting for peer timed out"))
+      }, timeout)
       this._getIpfsRoom(address).once("peer joined", id => {
         if (!peerId || peerId === id) {
+          clearTimeout(timer)
           resolve()
         }
       })
-      setTimeout(() => {
-        reject(new Error("Waiting for peer timed out"))
-      }, timeout)
     })
   }
 
-  static async create(): Promise<IpfsTransportProvider> {
-    const ipfsNode = await createIpfsNode()
-    return new IpfsTransportProvider(ipfsNode)
+  static async create(): Promise<Libp2pTransportProvider> {
+    const ipfsNode = await createMockIpfsNode()
+    return new Libp2pTransportProvider(ipfsNode)
   }
 
   async destroy() {
     await this._leaveRooms()
-    await destroyIpfsNode(this._ipfsNode)
+    await destroyMockIpfsNode(this._ipfsNode)
     this._ipfsNode = null
   }
 

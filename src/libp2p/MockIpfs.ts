@@ -1,26 +1,21 @@
-import Ipfs from "ipfs"
-import { getRepoPath } from "./Utils"
+import MockIpfs from "@daocasino/mock-ipfs"
 import { Logger } from "@daocasino/dc-logging"
 import { config, TransportType } from "@daocasino/dc-configs"
 
-const defaultSwarm = config.default.transportServersSwarm[TransportType.IPFS]
+const defaultSwarm = config.default.transportServersSwarm[TransportType.LIBP2P]
 
-const logger = new Logger("createIpfsNode")
-export function createIpfsNode(
+const logger = new Logger("createMockIpfsNode")
+export function createMockIpfsNode(
   Swarm: string[] = defaultSwarm,
   attempt: number = 0
-): Promise<Ipfs> {
+): Promise<MockIpfs> {
   const promise = new Promise((resolve, reject) => {
     const errors = []
-    const ipfs = new Ipfs({
-      repo: getRepoPath(),
-      EXPERIMENTAL: {
-        pubsub: true
-      },
+    const ipfs = new MockIpfs(Swarm, {
       config: {
-        Addresses: {
-          Swarm
-        }
+        EXPERIMENTAL: {
+            pubsub: true
+        },
       }
     })
       .on("start", () => {
@@ -39,17 +34,17 @@ export function createIpfsNode(
       logger.info(`All signal server in swarm raised errors`)
       throw error
     }
-    logger.warn(`Error creating ipfs node, swarm top ${Swarm[0]}`)
+    logger.warn(`Error creating libp2p node, swarm top ${Swarm[0]}`)
     logger.warn(error)
     Swarm.push(Swarm.shift())
-    logger.info(`Trying to create ipfs node with swarm top ${Swarm[0]}`)
-    return createIpfsNode(Swarm, attempt + 1)
+    logger.info(`Trying to create libp2p node with swarm top ${Swarm[0]}`)
+    return createMockIpfsNode(Swarm, attempt + 1)
   })
 }
 
-export function destroyIpfsNode(ipfs: Ipfs): Promise<void> {
+export function destroyMockIpfsNode(mockIpfs: MockIpfs): Promise<void> {
   return new Promise((resolve, reject) => {
-    ipfs.stop(error => {
+    mockIpfs.stop(error => {
       if (error) {
         reject(error)
       }

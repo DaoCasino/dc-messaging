@@ -1,7 +1,7 @@
 import { IpfsTransportProvider, createIpfsNode } from "../index"
 
 import IpfsRoom from "ipfs-pubsub-room"
-import { Logger } from "dc-logging"
+import { Logger } from "@daocasino/dc-logging"
 
 const room12 =
   "02a360faf69c98cbb776ee848ab7e539b0c1266689b6d84366465dab5dc1cc29"

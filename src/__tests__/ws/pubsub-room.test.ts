@@ -2,8 +2,8 @@ import WebSocket from 'ws'
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import { Room } from '../../ws/pubsub-room'
-import { Logger } from 'dc-logging'
-import { config, TransportType } from "dc-configs"
+import { Logger } from '@daocasino/dc-logging'
+import { config, TransportType } from "@daocasino/dc-configs"
 
 const log = new Logger('Test:')
 const ROOM_NAME = 'room-name'

@@ -1,8 +1,8 @@
 import { describe, it } from "mocha"
 import { expect } from "chai"
-import { Logger } from "dc-logging"
+import { Logger } from "@daocasino/dc-logging"
 import { IMessagingProvider, ITransportProviderFactory } from "../Interfaces"
-import { TransportType } from "dc-configs"
+import { TransportType } from "@daocasino/dc-configs"
 import { TransportProviderFactory } from "../TransportProviderFactory"
 import fs from "fs"
 import path from "path"
@@ -26,7 +26,7 @@ class TestService implements ITestService {
 
     checkFiles (info: FileUpload) {
         const files = readFiles(__dirname)
-        console.log({ remote: info.files, original: files.files })
+        // console.log({ remote: info.files, original: files.files })
         expect(info).to.deep.equal(files)
     }
 
@@ -66,7 +66,7 @@ const test = (factory: ITransportProviderFactory) => describe(`Transport provide
         testService.checkFiles(files)
 
         const remoteProvider = await factory.create()
-        const remoteTestService = await remoteProvider.getRemoteInterface<ITestService>(ROOM_ADDRESS, "Remote WS TestService interface")
+        const remoteTestService = await remoteProvider.getRemoteInterface<ITestService>(ROOM_ADDRESS, "Remote TestService interface")
 
         try {
             const result = await remoteTestService.sum(1, 1)
@@ -82,7 +82,13 @@ const test = (factory: ITransportProviderFactory) => describe(`Transport provide
     })
 })
 
-
-test(new TransportProviderFactory(TransportType.IPFS))
-test(new TransportProviderFactory(TransportType.WS))
-test(new TransportProviderFactory(TransportType.DIRECT))
+if(Object.values(TransportType).includes(process.env.DC_TRANSPORT)) {
+    test(new TransportProviderFactory(TransportType[process.env.DC_TRANSPORT]))
+}
+else {
+    Object.values(TransportType).forEach(key => {
+        if(typeof key === 'number') {
+            test(new TransportProviderFactory(key))
+        }
+    })
+}
