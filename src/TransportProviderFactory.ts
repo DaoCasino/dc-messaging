@@ -3,7 +3,7 @@ import { IpfsTransportProvider } from "./Ipfs/IpfsTransportProvider"
 import { WebSocketTransportProvider } from "./ws/WebSocketTransportProvider"
 import { DirectTransportProvider } from "./direct/DirectTransportProvider"
 import { config, TransportType } from "@daocasino/dc-configs"
-import { Libp2pTransportProvider } from "./libp2p/libp2pTransportProvider"
+import { Libp2pTransportProvider } from "./libp2p/Libp2pTransportProvider"
 
 export class TransportProviderFactory implements ITransportProviderFactory {
     private _type: TransportType
