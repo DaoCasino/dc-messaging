@@ -1,6 +1,6 @@
 {
   "name": "@daocasino/dc-messaging",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Messaging transport providers",
   "main": "./lib/index",
   "scripts": {
@@ -20,6 +20,7 @@
   "dependencies": {
     "@daocasino/dc-configs": "^0.2.2",
     "@daocasino/dc-logging": "^0.2.2",
+    "@daocasino/mock-ipfs": "^0.2.2",
     "@types/node": "^10.11.7",
     "@types/ws": "^6.0.1",
     "chai": "^4.1.2",
@@ -27,8 +28,7 @@
     "ipfs-pubsub-room": "1.4.0",
     "ipfs-repo": "0.23.1",
     "mocha": "^3.2.0",
-    "ws": "^6.1.0",
-    "@daocasino/mock-ipfs": "^0.1.0"
+    "ws": "^6.1.0"
   },
   "devDependencies": {
     "husky": "1.1.1",
