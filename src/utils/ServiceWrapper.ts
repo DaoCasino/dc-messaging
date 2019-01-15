@@ -89,6 +89,7 @@ export class ServiceWrapper<TService> {
         this.logger.debug(`call method ${method}`)
         response.result = await func.call(this._service, ...params)
       } catch (error) {
+
         console.error(error)
 
         this.logger.debug(`response.error method ${method}`)
