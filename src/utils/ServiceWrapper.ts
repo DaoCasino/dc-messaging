@@ -1,5 +1,5 @@
-import { ResponseMessage, RequestMessage, EventMessage } from "../Interfaces"
-import { Logger } from "@daocasino/dc-logging"
+import { ResponseMessage, RequestMessage, EventMessage } from '../Interfaces'
+import { Logger } from '@daocasino/dc-logging'
 
 let _id = 0
 export const getId = () => {
@@ -26,20 +26,21 @@ export class ServiceWrapper<TService> {
       this.wrapEventEmitter()
     }
     const loggerName =
-      (service.constructor && service.constructor.name) || "ServiceWrapper"
+      (service.constructor && service.constructor.name) || 'ServiceWrapper'
     this.logger = new Logger(loggerName)
   }
+
   wrapEventEmitter() {
     const onFunc = (this._service as any).on
     const eventNamesFunc = (this._service as any).eventNames
     const emitFunc = (this._service as any).emit
     if (
       onFunc &&
-      typeof onFunc === "function" &&
+      typeof onFunc === 'function' &&
       emitFunc &&
-      typeof emitFunc === "function" &&
+      typeof emitFunc === 'function' &&
       eventNamesFunc &&
-      typeof eventNamesFunc === "function"
+      typeof eventNamesFunc === 'function'
     ) {
       const eventNames = eventNamesFunc.call(this._service)
       eventNames.forEach(eventName => {
@@ -55,6 +56,7 @@ export class ServiceWrapper<TService> {
       this.serviceIsEventEmitter = true
     }
   }
+
   async onRequest(message: RequestMessage): Promise<any> {
     const { method, params, id, from } = message
 
@@ -67,20 +69,20 @@ export class ServiceWrapper<TService> {
     }
     if (!method) {
       response.error = {
-        status: "ERROR",
-        message: "Method not specified"
+        status: 'ERROR',
+        message: 'Method not specified'
       }
     }
-    if (method.substring(0, 1) === "_") {
+    if (method.substring(0, 1) === '_') {
       response.error = {
-        status: "ERROR",
-        message: "Cannot call private function"
+        status: 'ERROR',
+        message: 'Cannot call private function'
       }
     }
 
-    if (typeof func !== "function") {
+    if (typeof func !== 'function') {
       response.error = {
-        status: "ERROR",
+        status: 'ERROR',
         message: `No function ${method} in ${this._service.constructor.name}`
       }
     }
@@ -93,7 +95,7 @@ export class ServiceWrapper<TService> {
         console.error(error)
 
         this.logger.debug(`response.error method ${method}`)
-        response.error = { status: "ERROR", message: error.message }
+        response.error = { status: 'ERROR', message: error.message }
       }
     }
     if (response.error) {

@@ -1,11 +1,12 @@
-import Ipfs from "ipfs"
-import { getRepoPath } from "./Utils"
-import { Logger } from "@daocasino/dc-logging"
-import { config, TransportType } from "@daocasino/dc-configs"
+import Ipfs from 'ipfs'
+import { getRepoPath } from './Utils'
+import { Logger } from '@daocasino/dc-logging'
+import { config, TransportType } from '@daocasino/dc-configs'
 
 const defaultSwarm = config.default.transportServersSwarm[TransportType.IPFS]
 
-const logger = new Logger("createIpfsNode")
+const logger = new Logger('createIpfsNode')
+
 export function createIpfsNode(
   Swarm: string[] = defaultSwarm,
   attempt: number = 0
@@ -23,13 +24,13 @@ export function createIpfsNode(
         }
       }
     })
-      .on("start", () => {
+      .on('start', () => {
         const id = ipfs.id().then(info => {
           ipfs.id = info.id
           resolve(ipfs)
         })
       })
-      .on("error", error => {
+      .on('error', error => {
         errors.push(error)
         reject(error)
       })
