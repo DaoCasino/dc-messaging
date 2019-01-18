@@ -1,4 +1,4 @@
-import { TransportType } from "@daocasino/dc-configs"
+import { TransportType } from '@daocasino/dc-configs'
 
 type UserId = string
 
@@ -6,12 +6,14 @@ interface RoomInfo {
   privateKey: string
   allowedUsers: UserId[]
 }
+
 interface RequestMessage {
   from?: string
   method: string
   params: any[]
   id: number
 }
+
 interface EventMessage {
   from?: string
   eventName: string
@@ -50,5 +52,5 @@ export {
   ResponseMessage,
   RequestMessage,
   RoomInfo,
-  EventMessage,
+  EventMessage
 }
