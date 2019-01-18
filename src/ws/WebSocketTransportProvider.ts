@@ -3,13 +3,13 @@ import { Room } from './pubsub-room' // TODO: исправить
 import {
   IMessagingProvider,
   EventMessage
-} from "../Interfaces"
-import { RemoteProxy, getId } from "../utils/RemoteProxy"
-import { ServiceWrapper } from "../utils/ServiceWrapper"
-import { Logger } from "@daocasino/dc-logging"
-import { config, TransportType } from "@daocasino/dc-configs"
+} from '../Interfaces'
+import { RemoteProxy, getId } from '../utils/RemoteProxy'
+import { ServiceWrapper } from '../utils/ServiceWrapper'
+import { Logger } from '@daocasino/dc-logging'
+import { config, TransportType } from '@daocasino/dc-configs'
 
-const logger = new Logger("WebSocketTransportProvider")
+const logger = new Logger('WebSocketTransportProvider')
 
 interface WebSocketTransportProviderOptions {
   waitForPeers: boolean
@@ -32,6 +32,7 @@ export class WebSocketTransportProvider implements IMessagingProvider {
   private _ws: WebSocket
   private _roomsMap: Map<string, any>
   private _options: WebSocketTransportProviderOptions
+
   private constructor(ws: WebSocket, options?: WebSocketTransportProviderOptions) {
     this._options = { waitForPeers: true, ...options }
     this._ws = ws
@@ -41,7 +42,7 @@ export class WebSocketTransportProvider implements IMessagingProvider {
   private async _leaveRoom(address): Promise<boolean> {
     const room = this._roomsMap.get(address)
     if (room) {
-      if(await room.leave() === true) {
+      if (await room.leave() === true) {
         return this._roomsMap.delete(address)
       }
     }
@@ -61,14 +62,14 @@ export class WebSocketTransportProvider implements IMessagingProvider {
   ): Promise<any> {
     return new Promise((resolve, reject) => {
       const room = this._getWebSocketRoom(address)
-      room.once("peer joined", id => {
+      room.once('peer joined', id => {
         // console.log({ address, room })
         if (!peerId || peerId === id) {
           resolve()
         }
       })
       setTimeout(() => {
-        reject(new Error("Waiting for peer timed out"))
+        reject(new Error('Waiting for peer timed out'))
       }, timeout)
     })
   }
@@ -84,10 +85,10 @@ export class WebSocketTransportProvider implements IMessagingProvider {
       this._ws.close()
       this._ws = null
     } else {
-        this._ws.on('open', () => {
-            this._ws.close()
-            this._ws = null
-        })
+      this._ws.on('open', () => {
+        this._ws.close()
+        this._ws = null
+      })
     }
   }
 
@@ -95,11 +96,11 @@ export class WebSocketTransportProvider implements IMessagingProvider {
     let room = this._roomsMap.get(address)
     if (!room) {
       room = new Room(this._ws, address)
-        .on("error", error => {
+        .on('error', error => {
           logger.error(error)
         })
-        .on("peer joined", async id => {
-          const roomName = `${name || ""} ${address}`
+        .on('peer joined', async id => {
+          const roomName = `${name || ''} ${address}`
           const myPeerId = await room.getPeerId()
           logger.debug(
             `Peer joined ${id} to ${myPeerId} in room ${roomName}`
@@ -145,12 +146,12 @@ export class WebSocketTransportProvider implements IMessagingProvider {
   ): Promise<TRemoteInterface> {
     const webSocketRoom = this._getWebSocketRoom(
       address,
-      `Remote interface ${roomName || ""}`
+      `Remote interface ${roomName || ''}`
     )
 
     const proxy = new RemoteProxy()
     const self = this
-    webSocketRoom.on("message", async message => {
+    webSocketRoom.on('message', async message => {
       const peerId = await webSocketRoom.getPeerId()
 
       if (message.from !== peerId) {
@@ -171,7 +172,7 @@ export class WebSocketTransportProvider implements IMessagingProvider {
     const webSocketRoom = this._getWebSocketRoom(
       address,
       `Expose service ${(service.constructor && service.constructor.name) ||
-        ""}`
+      ''}`
     )
 
     const self = this
@@ -195,14 +196,14 @@ export class WebSocketTransportProvider implements IMessagingProvider {
       isEventEmitter
     )
     if (wrapper.serviceIsEventEmitter) {
-      webSocketRoom.on("peer joined", id => {
-        service.emit("connected", { id, address })
+      webSocketRoom.on('peer joined', id => {
+        service.emit('connected', { id, address })
       })
-      webSocketRoom.on("peer left", id => {
-        service.emit("disconnected", { id, address })
+      webSocketRoom.on('peer left', id => {
+        service.emit('disconnected', { id, address })
       })
     }
-    webSocketRoom.on("message", async message => {
+    webSocketRoom.on('message', async message => {
       const { from } = message
       const peerId = await webSocketRoom.getPeerId()
       if (from !== peerId) {

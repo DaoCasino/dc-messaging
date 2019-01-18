@@ -1,4 +1,4 @@
-import { ResponseMessage, RequestMessage, EventMessage } from "../Interfaces"
+import { ResponseMessage, RequestMessage, EventMessage } from '../Interfaces'
 
 let _id = 0
 export const getId = () => {
@@ -7,10 +7,8 @@ export const getId = () => {
 
 export class RemoteProxy {
   _subscriptions: Map<string, Set<any>>
-  _requestCallbacks: Map<
-    number,
-    { resolve: (data: any) => void; reject: (error: string) => void }
-  >
+  _requestCallbacks: Map<number,
+    { resolve: (data: any) => void; reject: (error: string) => void }>
 
   constructor() {
     this._requestCallbacks = new Map()
@@ -27,12 +25,12 @@ export class RemoteProxy {
       {},
       {
         get: (target, prop: string) => {
-          if (prop === "then") return null
-          if (prop === "constructor") return null
-          if (prop === "inspect") return null
+          if (prop === 'then') return null
+          if (prop === 'constructor') return null
+          if (prop === 'inspect') return null
           if (typeof prop === 'symbol') return null
-          if (prop === "on") return _self._handleSubscribe.bind(_self)
-          if (prop && prop.startsWith && !prop.startsWith("_")) {
+          if (prop === 'on') return _self._handleSubscribe.bind(_self)
+          if (prop && prop.startsWith && !prop.startsWith('_')) {
             return async (...params): Promise<any> => {
               const id = getId()
               sendRequest({ method: prop, params, id })
@@ -47,7 +45,7 @@ export class RemoteProxy {
             }
           } else {
             return params => {
-              throw new Error("Cannot call private function")
+              throw new Error('Cannot call private function')
             }
           }
         }
@@ -55,9 +53,10 @@ export class RemoteProxy {
     )
     return proxy as TRemoteInterface
   }
+
   private _handleSubscribe(...params: any[]) {
     const [eventName, callback] = params
-    if (typeof eventName === "string" && typeof callback === "function") {
+    if (typeof eventName === 'string' && typeof callback === 'function') {
       let subscriptions = this._subscriptions.get(eventName)
       if (!subscriptions) {
         subscriptions = new Set()
@@ -66,6 +65,7 @@ export class RemoteProxy {
       subscriptions.add(callback)
     }
   }
+
   onMessage(message: ResponseMessage | EventMessage) {
     const eventMessage = message as EventMessage
     if (eventMessage.eventName) {
@@ -77,6 +77,7 @@ export class RemoteProxy {
       this._onRequestResponse(responseMessage)
     }
   }
+
   _onEventMessage(message: EventMessage) {
     const { id, eventName, params } = message
     const callbacks = this._subscriptions.get(eventName)
@@ -84,6 +85,7 @@ export class RemoteProxy {
       callbacks.forEach(callback => callback(...params))
     }
   }
+
   _onRequestResponse(message: ResponseMessage) {
     const { id, result, error } = message
 

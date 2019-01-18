@@ -1,10 +1,11 @@
-import MockIpfs from "@daocasino/mock-ipfs"
-import { Logger } from "@daocasino/dc-logging"
-import { config, TransportType } from "@daocasino/dc-configs"
+import MockIpfs from '@daocasino/mock-ipfs'
+import { Logger } from '@daocasino/dc-logging'
+import { config, TransportType } from '@daocasino/dc-configs'
 
 const defaultSwarm = config.default.transportServersSwarm[TransportType.LIBP2P]
 
-const logger = new Logger("createMockIpfsNode")
+const logger = new Logger('createMockIpfsNode')
+
 export function createMockIpfsNode(
   Swarm: string[] = defaultSwarm,
   attempt: number = 0
@@ -14,17 +15,17 @@ export function createMockIpfsNode(
     const ipfs = new MockIpfs(Swarm, {
       config: {
         EXPERIMENTAL: {
-            pubsub: true
-        },
+          pubsub: true
+        }
       }
     })
-      .on("start", () => {
+      .on('start', () => {
         const id = ipfs.id().then(info => {
           ipfs.id = info.id
           resolve(ipfs)
         })
       })
-      .on("error", error => {
+      .on('error', error => {
         errors.push(error)
         reject(error)
       })
