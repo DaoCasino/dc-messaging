@@ -1,21 +1,39 @@
 {
-  "name": "dc-messaging",
-  "version": "1.0.0",
+  "name": "@daocasino/dc-messaging",
+  "version": "0.2.8",
   "description": "Messaging transport providers",
   "main": "./lib/index",
   "scripts": {
-    "build": "npm-run-all typescript",
+    "build:ts": "yarn typescript",
+    "build": "yarn typescript",
     "clean": "rimraf lib",
-    "typescript": "tsc --build"
+    "typescript": "tsc --build",
+    "test:ipfs": "mocha --timeout 999999999 -r ts-node/register src/__tests__/ipfsTransportProvider.test.ts",
+    "test:tp": "mocha --timeout 999999999 -r ts-node/register src/__tests__/TransportProvider.test.ts",
+    "test:tp:libp2p": "DC_TRANSPORT=LIBP2P yarn test:tp",
+    "test:tp:direct": "DC_TRANSPORT=DIRECT yarn test:tp",
+    "test:wsroom": "mocha --timeout 999999999 -r ts-node/register src/__tests__/ws/pubsub-room.test.ts"
   },
   "keywords": [],
   "author": "",
   "license": "GPL-3.0",
   "dependencies": {
-    "debug": "^3.1.0",
-    "dc-logging":"^1.0.0",
-    "ipfs": "0.31.7",
+    "@daocasino/dc-configs": "^0.2.4",
+    "@daocasino/dc-logging": "^0.2.4",
+    "@daocasino/mock-ipfs": "^0.2.4",
+    "@types/node": "^10.11.7",
+    "@types/ws": "^6.0.1",
+    "chai": "^4.1.2",
+    "ipfs": "^0.33.1",
     "ipfs-pubsub-room": "1.4.0",
-    "ipfs-repo": "0.23.1"
-  }
+    "ipfs-repo": "0.23.1",
+    "mocha": "^3.2.0",
+    "ws": "^6.1.0"
+  },
+  "devDependencies": {
+    "husky": "1.1.1",
+    "tslint": "5.11.0",
+    "typescript": "^3.1.2"
+  },
+  "gitHead": "c83ce2ab1c77daa4fabf666260b0698d37dbf312"
 }
